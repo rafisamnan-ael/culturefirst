@@ -1,0 +1,46 @@
+# CultureFirst Vercel Deployment - Manual Terminal Steps
+# Execute these commands in order (takes ~5 minutes)
+
+## Step 1: Verify Git push was successful
+cd "D:\Culture First App\culturefirst"
+git log --oneline | head -1
+
+## Step 2: Go to Vercel and deploy manually (takes 2-3 minutes)
+# Open: https://vercel.com/new
+# 1. Click "Import Git Repository"
+# 2. Search "culturefirst" and select it
+# 3. Framework: Next.js (auto-detected)
+# 4. Add Environment Variables (see below)
+# 5. Click Deploy
+
+## Environment Variables to Add in Vercel:
+# These are the keys to add in the Vercel import screen
+
+NEXT_PUBLIC_SUPABASE_URL=[Get from Supabase Dashboard → Settings → API → Project URL]
+NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY=[Get from Supabase Dashboard → Settings → API → anon public key]
+SUPABASE_SERVICE_ROLE_KEY=[Get from Supabase Dashboard → Settings → API → service_role secret]
+NEXT_PUBLIC_SITE_URL=https://culturefirst.vercel.app
+DATA_SOURCE=supabase
+DEV_AUTH=false
+SCORE_MIN_ANSWERED_PARAMETERS=3
+SCORE_MIN_WEIGHT_COVERAGE=0.6
+AGG_MIN_PROVISIONAL=5
+AGG_MIN_PUBLISHED=20
+
+## Step 3: After deployment completes
+# Vercel will give you a URL like: https://culturefirst-xyz.vercel.app
+# OR you can use: https://culturefirst.vercel.app
+
+## Step 4: Configure Supabase Auth Redirect
+# Go to: https://supabase.com/dashboard
+# Select your project
+# Go to: Authentication → URL Configuration
+# Add Redirect URL: https://culturefirst.vercel.app/auth/callback
+# Click Save
+
+## Step 5: Test
+# Visit your Vercel URL and test:
+# - Homepage
+# - Organization search
+# - Organization profile
+# - Sign up/Login
