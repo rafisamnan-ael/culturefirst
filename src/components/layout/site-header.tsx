@@ -1,0 +1,179 @@
+"use client";
+
+import Link from "next/link";
+import { useState } from "react";
+import { Menu, ShieldCheck, UserCircle2 } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { LanguageToggle } from "@/components/layout/language-toggle";
+import { useI18n } from "@/lib/i18n/provider";
+import { signOutAction, devSignIn } from "@/lib/auth/actions";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+
+export interface HeaderUser {
+  id: string;
+  displayName: string | null;
+  role: string;
+}
+
+export interface DevUser {
+  id: string;
+  label: string;
+  role: string;
+}
+
+const NAV = [
+  { href: "/organizations", key: "nav.directory" },
+  { href: "/categories", key: "nav.categories" },
+  { href: "/how-it-works", key: "nav.howItWorks" },
+  { href: "/methodology", key: "nav.methodology" },
+  { href: "/about", key: "nav.about" },
+];
+
+export function SiteHeader({
+  brandName,
+  user,
+  devUsers,
+}: {
+  brandName: string;
+  user: HeaderUser | null;
+  devUsers: DevUser[];
+}) {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const isStaff = user?.role === "admin" || user?.role === "moderator";
+
+  return (
+    <header className="sticky top-0 z-40 border-b border-border bg-soft/95 backdrop-blur">
+      <div className="container flex h-16 items-center justify-between gap-4">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-navy text-sm font-bold text-soft">
+              C
+            </span>
+            <span className="text-lg font-semibold tracking-tight text-navy">{brandName}</span>
+          </Link>
+          <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
+            {NAV.map((item) => (
+              <Link
+                key={item.href}
+                href={item.href}
+                className="text-sm font-medium text-charcoal/80 transition-colors hover:text-jade"
+              >
+                {t(item.key)}
+              </Link>
+            ))}
+          </nav>
+        </div>
+
+        <div className="flex items-center gap-3">
+          <LanguageToggle className="hidden sm:inline-flex" />
+          {user ? (
+            <div className="hidden items-center gap-2 sm:flex">
+              {isStaff && (
+                <Button asChild variant="ghost" size="sm">
+                  <Link href="/admin">
+                    <ShieldCheck className="h-4 w-4" />
+                    {t("nav.admin")}
+                  </Link>
+                </Button>
+              )}
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/dashboard">
+                  <UserCircle2 className="h-4 w-4" />
+                  {t("nav.dashboard")}
+                </Link>
+              </Button>
+              <form action={signOutAction}>
+                <Button type="submit" variant="outline" size="sm">
+                  {t("nav.logout")}
+                </Button>
+              </form>
+            </div>
+          ) : (
+            <div className="hidden items-center gap-2 sm:flex">
+              <Button asChild variant="ghost" size="sm">
+                <Link href="/login">{t("nav.login")}</Link>
+              </Button>
+              <Button asChild size="sm">
+                <Link href="/signup">{t("nav.signup")}</Link>
+              </Button>
+            </div>
+          )}
+
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger asChild>
+              <Button variant="outline" size="icon" className="lg:hidden" aria-label="Open menu">
+                <Menu className="h-5 w-5" />
+              </Button>
+            </DialogTrigger>
+            <DialogContent className="max-w-sm">
+              <DialogHeader>
+                <DialogTitle>{brandName}</DialogTitle>
+              </DialogHeader>
+              <nav className="flex flex-col gap-1" aria-label="Mobile">
+                {NAV.map((item) => (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    onClick={() => setOpen(false)}
+                    className="rounded-md px-3 py-2 text-sm font-medium text-charcoal hover:bg-warmgray"
+                  >
+                    {t(item.key)}
+                  </Link>
+                ))}
+                <div className="my-2 h-px bg-border" />
+                {user ? (
+                  <>
+                    {isStaff && (
+                      <Link href="/admin" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
+                        {t("nav.admin")}
+                      </Link>
+                    )}
+                    <Link href="/dashboard" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
+                      {t("nav.dashboard")}
+                    </Link>
+                    <form action={signOutAction}>
+                      <button type="submit" className="w-full rounded-md px-3 py-2 text-left text-sm hover:bg-warmgray">
+                        {t("nav.logout")}
+                      </button>
+                    </form>
+                  </>
+                ) : (
+                  <>
+                    <Link href="/login" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
+                      {t("nav.login")}
+                    </Link>
+                    <Link href="/signup" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
+                      {t("nav.signup")}
+                    </Link>
+                  </>
+                )}
+              </nav>
+              <div className="mt-4 flex flex-col gap-3">
+                <LanguageToggle />
+                {devUsers.length > 0 && (
+                  <div className="rounded-md border border-dashed border-gold/60 bg-gold/10 p-3">
+                    <p className="mb-2 text-xs font-semibold text-[#7a5f2e]">
+                      Development sign-in (fixtures mode)
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {devUsers.map((du) => (
+                        <form action={devSignIn} key={du.id}>
+                          <input type="hidden" name="userId" value={du.id} />
+                          <input type="hidden" name="redirectTo" value="/dashboard" />
+                          <Button type="submit" variant="outline" size="sm">
+                            {du.label}
+                          </Button>
+                        </form>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </DialogContent>
+          </Dialog>
+        </div>
+      </div>
+    </header>
+  );
+}
