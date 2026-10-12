@@ -16,9 +16,16 @@ const icons: Record<string, React.ComponentType<{ className?: string }>> = {
   user: UserCircle2,
 };
 
-export default async function LoginPage() {
+export default async function LoginPage({
+  searchParams,
+}: {
+  searchParams?: Promise<{ next?: string }>;
+}) {
   const { t } = await getServerT();
+  const params = await searchParams;
+  const nextTo = params?.next;
   const devMode = dataSource === "fixtures";
+  const redirectTo = nextTo && nextTo.startsWith("/") ? nextTo : "/dashboard";
 
   return (
     <div className="container flex max-w-md flex-col py-16">
@@ -40,7 +47,7 @@ export default async function LoginPage() {
                   return (
                     <form action={devSignIn} key={u.id}>
                       <input type="hidden" name="userId" value={u.id} />
-                      <input type="hidden" name="redirectTo" value="/dashboard" />
+                      <input type="hidden" name="redirectTo" value={redirectTo} />
                       <Button type="submit" variant="outline" className="w-full justify-start">
                         <Icon className="h-4 w-4" />
                         {u.label}

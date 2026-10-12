@@ -43,4 +43,28 @@
   .line-clamp-none {
     -webkit-line-clamp: unset;
   }
+  .glass {
+    background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(248,249,247,0.68));
+    backdrop-filter: saturate(1.15) blur(10px);
+    -webkit-backdrop-filter: saturate(1.15) blur(10px);
+  }
+  .shimmer-soft {
+    position: relative;
+    overflow: hidden;
+  }
+  .shimmer-soft::after {
+    content: "";
+    position: absolute;
+    inset: 0;
+    transform: translateX(-100%);
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.45), transparent);
+    animation: shimmer 2.4s ease-in-out infinite;
+  }
+  .reveal {
+    animation: reveal 0.5s ease-out both;
+  }
+  @keyframes reveal {
+    from { opacity: 0; transform: translateY(6px) scale(0.99); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
 }

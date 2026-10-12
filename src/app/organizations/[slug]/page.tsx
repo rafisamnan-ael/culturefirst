@@ -2,8 +2,9 @@ import { notFound } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Globe, CheckCircle2 } from "lucide-react";
+import { MapPin, Globe, Star } from "lucide-react";
 import { OrganizationProfileView, type ProfilePerspective, type ProfileParameter } from "@/components/organizations/organization-profile-view";
+import { OrgLogo } from "@/components/organizations/org-logo";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 import { pick } from "@/lib/i18n/pick";
@@ -123,9 +124,7 @@ export default async function OrganizationProfilePage({
 
       <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
-          <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-lg bg-navy text-xl font-bold text-soft">
-            {org.officialName.slice(0, 1)}
-          </div>
+          <OrgLogo slug={org.slug} name={org.officialName} />
           <div>
             <h1 className="text-2xl font-semibold tracking-tight text-charcoal sm:text-3xl">
               {org.officialName}
@@ -144,27 +143,32 @@ export default async function OrganizationProfilePage({
                   {org.district && org.district !== org.city ? `, ${org.district}` : ""}
                 </span>
               )}
-              {org.verified && (
-                <span className="inline-flex items-center gap-1 text-jade">
-                  <CheckCircle2 className="h-3 w-3" />
-                  {t("org.verified")}
-                </span>
-              )}
               <Badge variant="outline">{org.claimStatus === "claimed" ? t("org.claimed") : t("org.unclaimed")}</Badge>
             </div>
           </div>
         </div>
-        {org.website && (
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          {org.website && (
+            <a
+              href={org.website}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              className="inline-flex items-center gap-1 text-sm text-jade hover:underline"
+            >
+              <Globe className="h-4 w-4" />
+              {locale === "bn" ? "ওয়েবসাইট" : "Website"}
+            </a>
+          )}
           <a
-            href={org.website}
+            href={org.googleMapsUrl ?? `https://www.google.com/search?q=${encodeURIComponent(`${org.officialName} ${org.city ?? "Bangladesh"} Google reviews`)}`}
             target="_blank"
             rel="noopener noreferrer nofollow"
-            className="inline-flex items-center gap-1 text-sm text-jade hover:underline"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-charcoal shadow-card transition hover:bg-warmgray"
           >
-            <Globe className="h-4 w-4" />
-            {locale === "bn" ? "ওয়েবসাইট" : "Website"}
+            <Star className="h-4 w-4 text-gold" />
+            {locale === "bn" ? "গুগল রিভিউ ও রেটিং" : "View Google reviews & ratings"}
           </a>
-        )}
+        </div>
       </header>
 
       <p className="mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">

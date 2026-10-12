@@ -41,6 +41,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ slug: s
     };
   }
 
+  // Guest can preview the wizard; actual submit checks auth (wizard gates the last step + server rejects).
   const user = await getCurrentUser();
 
   return (

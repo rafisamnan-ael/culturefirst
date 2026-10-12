@@ -42,14 +42,18 @@ const config: Config = {
       boxShadow: {
         card: "0 1px 2px rgba(16,40,63,0.04), 0 4px 16px rgba(16,40,63,0.06)",
         elevated: "0 8px 30px rgba(16,40,63,0.10)",
+        soft: "0 6px 22px rgba(16,40,63,0.08)",
       },
       keyframes: {
         "fade-in": { from: { opacity: "0", transform: "translateY(4px)" }, to: { opacity: "1", transform: "translateY(0)" } },
         shimmer: { "100%": { transform: "translateX(100%)" } },
+        "float-in": { from: { opacity: "0", transform: "translateY(12px) scale(0.98)" }, to: { opacity: "1", transform: "translateY(0) scale(1)" } },
+        pulseSoft: { "0%,100%": { opacity: "1" }, "50%": { opacity: "0.86" } },
       },
       animation: {
-        "fade-in": "fade-in 0.3s ease-out",
-        shimmer: "shimmer 1.5s infinite",
+        "fade-in": "fade-in 0.35s ease-out",
+        "float-in": "float-in 0.5s cubic-bezier(.22,1,.36,1)",
+        shimmer: "shimmer 1.8s ease-in-out infinite",
       },
     },
   },

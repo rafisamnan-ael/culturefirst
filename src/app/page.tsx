@@ -41,7 +41,11 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <section className="border-b border-border bg-gradient-to-b from-navy to-navy-secondary text-soft">
+      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-navy via-navy-secondary to-[#0d2236] text-soft">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="absolute -right-24 -top-24 h-[380px] w-[380px] rounded-full bg-jade/15 blur-3xl" />
+          <div className="absolute -bottom-24 -left-24 h-[360px] w-[360px] rounded-full bg-gold/12 blur-3xl" />
+        </div>
         <div className="container grid gap-10 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
           <div>
             <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-soft/20 px-3 py-1 text-xs font-medium text-jade-highlight">
@@ -116,7 +120,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Categories */}
+       {/* Categories */}
       <section className="container py-14">
         <div className="mb-6 flex items-end justify-between gap-4">
           <div>
@@ -130,14 +134,16 @@ export default async function HomePage() {
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.slice(0, 6).map((c) => (
-            <CategoryCard key={c.id} category={c} count={orgCountByCategory.get(c.id) ?? 0} locale={locale} />
+          {categories.slice(0, 6).map((c, idx) => (
+            <div key={c.id} className="reveal" style={{ animationDelay: `${idx * 60}ms` }}>
+              <CategoryCard category={c} count={orgCountByCategory.get(c.id) ?? 0} locale={locale} />
+            </div>
           ))}
         </div>
       </section>
 
-      {/* Featured */}
-      <section className="border-y border-border bg-white py-14">
+       {/* Featured */}
+      <section className="relative border-y border-border bg-gradient-to-b from-white via-white to-soft/70 py-14">
         <div className="container">
           <div className="mb-6 flex items-end justify-between gap-4">
             <h2 className="text-2xl font-semibold text-charcoal">{t("home.featured")}</h2>
@@ -163,7 +169,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Perspectives */}
+       {/* Perspectives */}
       <section className="container py-14">
         <div className="grid gap-8 lg:grid-cols-3">
           <div className="lg:col-span-1">
@@ -171,8 +177,8 @@ export default async function HomePage() {
             <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("home.perspectivesBody")}</p>
           </div>
           <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
-            {perspectives.map((p) => (
-              <Card key={p.title}>
+            {perspectives.map((p, idx) => (
+              <Card key={p.title} className="reveal" style={{ animationDelay: `${idx * 70}ms` as string } as never}>
                 <CardContent className="space-y-2 p-5">
                   <p.icon className="h-5 w-5 text-jade" />
                   <h3 className="font-semibold text-charcoal">{p.title}</h3>
@@ -212,15 +218,16 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* CTA */}
+       {/* CTA */}
       <section className="container py-16">
-        <div className="rounded-lg border border-border bg-gradient-to-br from-jade-highlight/40 to-white p-8 sm:p-12">
-          <div className="flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
+        <div className="relative overflow-hidden rounded-xl border border-jade/20 bg-gradient-to-br from-jade-highlight via-jade-highlight/50 to-white p-8 shadow-soft sm:p-12">
+          <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-jade/10 blur-2xl" />
+          <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
             <div>
               <h2 className="text-2xl font-semibold text-charcoal">{t("home.ctaTitle")}</h2>
               <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("home.ctaBody")}</p>
             </div>
-            <Button asChild size="lg">
+            <Button asChild size="lg" className="shadow-elevated">
               <Link href="/organizations">
                 <Plus className="h-4 w-4" />
                 {t("nav.writeReview")}

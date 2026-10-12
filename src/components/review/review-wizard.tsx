@@ -378,7 +378,7 @@ export function ReviewWizard({
               {!isAuthed && (
                 <p className="rounded-md bg-navy/5 p-3 text-sm text-navy">
                   {locale === "bn" ? "জমা দিতে সাইন ইন করতে হবে।" : "You must be signed in to submit a review."}{" "}
-                  <a href="/login" className="font-medium text-jade underline">
+                  <a href={`/login?next=${encodeURIComponent(`/organizations/${organization.slug}/review`)}`} className="font-medium text-jade underline">
                     {t("nav.login")}
                   </a>
                 </p>
@@ -396,7 +396,7 @@ export function ReviewWizard({
           {t("common.back")}
         </Button>
         {step < steps.length - 1 ? (
-          <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed() || !isAuthed}>
+          <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()}>
             {t("common.next")}
             <ChevronRight className="h-4 w-4" />
           </Button>

@@ -14,7 +14,6 @@ import {
 } from "recharts";
 import { ExternalLink, Flag, PenLine } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { ScoreDisplay, scoreColor, type Sufficiency } from "@/components/organizations/score-display";
 import { ParameterBar } from "@/components/organizations/parameter-bar";
@@ -222,16 +221,16 @@ export function OrganizationProfileView({
             <h3 className="font-semibold text-charcoal">{t("org.viewOnGoogle")}</h3>
             <p className="mt-1 text-xs text-muted-foreground">{t("org.googleSeparate")}</p>
             <div className="mt-3">
-              {googleMapsUrl ? (
-                <Button asChild variant="outline" size="sm">
-                  <a href={googleMapsUrl} target="_blank" rel="noopener noreferrer nofollow">
-                    <ExternalLink className="h-4 w-4" />
-                    {t("org.viewOnGoogle")}
-                  </a>
-                </Button>
-              ) : (
-                <Badge variant="outline">{locale === "bn" ? "লিংক নেই" : "No confirmed link"}</Badge>
-              )}
+              <Button asChild variant="outline" size="sm">
+                <a
+                  href={googleMapsUrl ?? `https://www.google.com/search?q=${encodeURIComponent(slug + " Google reviews")}`}
+                  target="_blank"
+                  rel="noopener noreferrer nofollow"
+                >
+                  <ExternalLink className="h-4 w-4" />
+                  {t("org.viewOnGoogle")}
+                </a>
+              </Button>
             </div>
           </CardContent>
         </Card>
