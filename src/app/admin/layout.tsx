@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { LayoutDashboard, Building2, Tags, FileSliders, ShieldAlert, BadgeCheck, Settings } from "lucide-react";
+import { LayoutDashboard, Building2, Tags, FileSliders, ShieldAlert, BadgeCheck, Settings, ClipboardList } from "lucide-react";
 import { getCurrentUser, isStaff } from "@/lib/auth";
 import { getServerT } from "@/lib/i18n/server";
 
@@ -12,6 +12,7 @@ const NAV = [
   { href: "/admin", key: "admin.dashboard", icon: LayoutDashboard },
   { href: "/admin/moderation", key: "admin.moderation", icon: ShieldAlert },
   { href: "/admin/organizations", key: "admin.organizations", icon: Building2 },
+  { href: "/admin/suggestions", key: "admin.suggestions", icon: ClipboardList },
   { href: "/admin/categories", key: "admin.categories", icon: Tags },
   { href: "/admin/templates", key: "admin.templates", icon: FileSliders },
   { href: "/admin/claims", key: "admin.claims", icon: BadgeCheck },

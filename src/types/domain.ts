@@ -229,6 +229,25 @@ export interface OrganizationClaim {
   createdAt: string;
 }
 
+export type OrganizationSuggestionStatus = "pending" | "approved" | "rejected";
+
+export interface OrganizationSuggestion {
+  id: string;
+  suggestedName: string;
+  suggestedBengaliName: string | null;
+  categoryId: string;
+  division: string | null;
+  district: string | null;
+  city: string | null;
+  website: string | null;
+  address: string | null;
+  reason: string | null;
+  submittedByUserId: string | null;
+  status: OrganizationSuggestionStatus;
+  reviewReason: string | null;
+  createdAt: string;
+}
+
 export interface OrganizationRepresentative {
   id: string;
   organizationId: string;

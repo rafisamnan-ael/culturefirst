@@ -177,6 +177,12 @@ export interface Store {
   listResponsesForReviews(reviewIds: string[]): Promise<OrganizationResponse[]>;
   setResponseStatus(id: string, status: "pending" | "published" | "rejected", actorId: string): Promise<void>;
 
+  // ---- Organization suggestions (manual add, requires admin approval) ----
+  createSuggestion(input: Omit<import("@/types/domain").OrganizationSuggestion, "id" | "createdAt" | "status" | "reviewReason">): Promise<import("@/types/domain").OrganizationSuggestion>;
+  listSuggestions(): Promise<import("@/types/domain").OrganizationSuggestion[]>;
+  approveSuggestion(id: string, actorId: string): Promise<Organization>;
+  rejectSuggestion(id: string, reason: string | null, actorId: string): Promise<void>;
+
   // ---- Audit ----
   listAuditLogs(limit?: number): Promise<AuditLog[]>;
 }

@@ -1,4 +1,3 @@
-import Link from "next/link";
 import type { Metadata } from "next";
 import { ShieldCheck, UserCircle2, Wrench } from "lucide-react";
 import { Button } from "@/components/ui/button";
@@ -25,10 +24,7 @@ export default async function LoginPage() {
     <div className="container flex max-w-md flex-col py-16">
       <h1 className="text-2xl font-semibold tracking-tight text-charcoal">{t("auth.loginTitle")}</h1>
       <p className="mt-2 text-sm text-muted-foreground">
-        {t("auth.noAccount")}{" "}
-        <Link href="/signup" className="font-medium text-jade hover:underline">
-          {t("nav.signup")}
-        </Link>
+        {t("auth.loginOnly")}
       </p>
 
       <div className="mt-8">

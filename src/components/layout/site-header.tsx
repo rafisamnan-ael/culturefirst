@@ -94,9 +94,6 @@ export function SiteHeader({
               <Button asChild variant="ghost" size="sm">
                 <Link href="/login">{t("nav.login")}</Link>
               </Button>
-              <Button asChild size="sm">
-                <Link href="/signup">{t("nav.signup")}</Link>
-              </Button>
             </div>
           )}
 
@@ -142,9 +139,6 @@ export function SiteHeader({
                   <>
                     <Link href="/login" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
                       {t("nav.login")}
-                    </Link>
-                    <Link href="/signup" onClick={() => setOpen(false)} className="rounded-md px-3 py-2 text-sm hover:bg-warmgray">
-                      {t("nav.signup")}
                     </Link>
                   </>
                 )}

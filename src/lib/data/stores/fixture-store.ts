@@ -12,6 +12,7 @@ import type {
   OrganizationRepresentative,
   OrganizationResponse,
   OrganizationScoreAggregate,
+  OrganizationSuggestion,
   PlatformSettings,
   Profile,
   RatingParameter,
@@ -39,6 +40,7 @@ import type {
   Store,
   TemplateDraft,
 } from "@/lib/data/store";
+import { StoreError } from "@/lib/data/store";
 
 interface Db extends SeedState {
   aggregates: OrganizationScoreAggregate[];
@@ -47,6 +49,7 @@ interface Db extends SeedState {
   claims: OrganizationClaim[];
   representatives: OrganizationRepresentative[];
   moderationActions: ModerationAction[];
+  suggestions: OrganizationSuggestion[];
 }
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -69,6 +72,16 @@ function paginate<T>(items: T[], page = 1, pageSize = 12): Paginated<T> {
 
 function normalize(s: string): string {
   return s.toLowerCase().trim();
+}
+
+function slugify(s: string): string {
+  return s
+    .toLowerCase()
+    .trim()
+    .replace(/[^a-z0-9\s-]/g, "")
+    .replace(/\s+/g, "-")
+    .replace(/-+/g, "-")
+    .replace(/^-|-$/g, "");
 }
 
 /** JSON-file-backed development store. Never used in production. */
@@ -99,8 +112,10 @@ export class FixtureStore implements Store {
         claims: [],
         representatives: [],
         moderationActions: [],
+        suggestions: [],
       };
     }
+    if (!db.suggestions) db.suggestions = [];
     const store = new FixtureStore(db);
     store.recomputeAll();
     if (!db.aggregates.length) store.recomputeAll();
@@ -814,6 +829,76 @@ export class FixtureStore implements Store {
     if (!response) return;
     response.status = status;
     this.audit(actorId, `response.${status}`, "organization_response", id);
+    await this.persist();
+  }
+
+  // -------------------------------------------------------------------------
+  // Organization suggestions (manual add — requires admin approval)
+  // -------------------------------------------------------------------------
+  async createSuggestion(
+    input: Omit<OrganizationSuggestion, "id" | "createdAt" | "status" | "reviewReason">,
+  ): Promise<OrganizationSuggestion> {
+    const suggestion: OrganizationSuggestion = {
+      ...input,
+      id: newId("sug"),
+      status: "pending",
+      reviewReason: null,
+      createdAt: new Date().toISOString(),
+    };
+    this.db.suggestions.unshift(suggestion);
+    await this.persist();
+    return suggestion;
+  }
+
+  async listSuggestions(): Promise<OrganizationSuggestion[]> {
+    return [...this.db.suggestions];
+  }
+
+  async approveSuggestion(id: string, actorId: string): Promise<Organization> {
+    const suggestion = this.db.suggestions.find((s) => s.id === id);
+    if (!suggestion) throw new StoreError("Suggestion not found");
+    const baseSlug = slugify(suggestion.suggestedName);
+    let slug = baseSlug || `org-${Date.now()}`;
+    let n = 1;
+    while (this.db.organizations.some((o) => o.slug === slug)) {
+      slug = `${baseSlug}-${++n}`;
+    }
+    const nowIso = new Date().toISOString();
+    const org: Organization = {
+      id: newId("org"),
+      slug,
+      officialName: suggestion.suggestedName,
+      bengaliName: suggestion.suggestedBengaliName,
+      alternateNames: [],
+      categoryId: suggestion.categoryId,
+      parentOrganizationId: null,
+      description: { en: "", bn: "" },
+      website: suggestion.website,
+      address: suggestion.address,
+      division: suggestion.division,
+      district: suggestion.district,
+      city: suggestion.city,
+      status: "active",
+      googleMapsUrl: null,
+      googlePlaceId: null,
+      verified: true,
+      claimStatus: "unclaimed",
+      createdAt: nowIso,
+      updatedAt: nowIso,
+    };
+    this.db.organizations.push(org);
+    suggestion.status = "approved";
+    this.audit(actorId, "suggestion.approve", "organization_suggestion", id, org.id);
+    await this.persist();
+    return org;
+  }
+
+  async rejectSuggestion(id: string, reason: string | null, actorId: string): Promise<void> {
+    const suggestion = this.db.suggestions.find((s) => s.id === id);
+    if (!suggestion) return;
+    suggestion.status = "rejected";
+    suggestion.reviewReason = reason;
+    this.audit(actorId, "suggestion.reject", "organization_suggestion", id, reason ?? undefined);
     await this.persist();
   }
 

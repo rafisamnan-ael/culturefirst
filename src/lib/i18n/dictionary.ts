@@ -161,6 +161,11 @@ export const dictionary: Record<string, Bilingual> = {
 
   // Auth
   "auth.loginTitle": { en: "Sign in to CultureFirst", bn: "কালচারফার্স্টে সাইন ইন করুন" },
+  "auth.loginOnly": {
+    en: "Accounts are created by platform administrators. If you need access, please contact the CultureFirst team.",
+    bn: "অ্যাকাউন্ট প্ল্যাটফর্ম অ্যাডমিনিস্ট্রেটর তৈরি করেন। আপনার অ্যাক্সেস প্রয়োজন হলে কালচারফার্স্ট টিমের সাথে যোগাযোগ করুন।",
+  },
+  "admin.suggestions": { en: "Suggestions", bn: "প্রস্তাবনা" },
   "auth.signupTitle": { en: "Create your account", bn: "আপনার অ্যাকাউন্ট খুলুন" },
   "auth.email": { en: "Email", bn: "ইমেইল" },
   "auth.password": { en: "Password", bn: "পাসওয়ার্ড" },

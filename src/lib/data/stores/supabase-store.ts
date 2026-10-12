@@ -10,6 +10,7 @@ import type {
   OrganizationRepresentative,
   OrganizationResponse,
   OrganizationScoreAggregate,
+  OrganizationSuggestion,
   PlatformSettings,
   Profile,
   RatingParameter,
@@ -877,6 +878,103 @@ export class SupabaseStore implements Store {
       representativeUserId: str(r.representative_user_id), body: str(r.body),
       status: (str(r.status) as OrganizationResponse["status"]) ?? "pending", createdAt: iso(r.created_at),
     };
+  }
+
+  // -------------------------------------------------------------------------
+  // Organization suggestions (manual add — requires admin approval)
+  // -------------------------------------------------------------------------
+  private suggestion(r: Row): OrganizationSuggestion {
+    const detail = (r.detail ?? {}) as Record<string, unknown>;
+    const get = (k: string): string | null => {
+      const v = detail[k];
+      return typeof v === "string" ? v : null;
+    };
+    return {
+      id: str(r.id),
+      suggestedName: str(r.official_name),
+      suggestedBengaliName: get("bengaliName"),
+      categoryId: nullable<string>(r.category_id) ?? "",
+      division: get("division"),
+      district: get("district"),
+      city: get("city"),
+      website: get("website"),
+      address: get("address"),
+      reason: get("reason"),
+      submittedByUserId: nullable<string>(r.submitted_by),
+      status: (str(r.status) as OrganizationSuggestion["status"]) ?? "pending",
+      reviewReason: get("reviewReason"),
+      createdAt: iso(r.created_at),
+    };
+  }
+
+  async createSuggestion(
+    input: Omit<OrganizationSuggestion, "id" | "createdAt" | "status" | "reviewReason">,
+  ): Promise<OrganizationSuggestion> {
+    const { data, error } = await this.privileged.from("organization_suggestions").insert({
+      official_name: input.suggestedName,
+      category_id: input.categoryId || null,
+      submitted_by: input.submittedByUserId,
+      status: "pending",
+      detail: {
+        bengaliName: input.suggestedBengaliName,
+        division: input.division,
+        district: input.district,
+        city: input.city,
+        website: input.website,
+        address: input.address,
+        reason: input.reason,
+      },
+    }).select("*").single();
+    const row = this.must(data as Row | null, error, "suggestion");
+    return this.suggestion(row);
+  }
+
+  async listSuggestions(): Promise<OrganizationSuggestion[]> {
+    const { data } = await this.privileged.from("organization_suggestions").select("*").order("created_at", { ascending: false });
+    return ((data ?? []) as Row[]).map((r) => this.suggestion(r));
+  }
+
+  async approveSuggestion(id: string, actorId: string): Promise<Organization> {
+    const { data } = await this.privileged.from("organization_suggestions").select("*").eq("id", id).single();
+    const row = this.must(data as Row | null, { message: "not found" } as never, "suggestion");
+    const suggestion = this.suggestion(row);
+    const slug = suggestion.suggestedName
+      .toLowerCase()
+      .trim()
+      .replace(/[^a-z0-9\s-]/g, "")
+      .replace(/\s+/g, "-")
+      .replace(/-+/g, "-")
+      .replace(/^-|-$/g, "") || `org-${Date.now()}`;
+    const org = await this.createOrganization({
+      slug,
+      officialName: suggestion.suggestedName,
+      bengaliName: suggestion.suggestedBengaliName,
+      alternateNames: [],
+      categoryId: suggestion.categoryId,
+      parentOrganizationId: null,
+      description: { en: "", bn: "" },
+      website: suggestion.website,
+      address: suggestion.address,
+      division: suggestion.division,
+      district: suggestion.district,
+      city: suggestion.city,
+      status: "active",
+      googleMapsUrl: null,
+      googlePlaceId: null,
+      verified: true,
+      claimStatus: "unclaimed",
+    }, actorId);
+    await this.privileged.from("organization_suggestions").update({ status: "approved" }).eq("id", id);
+    await this.audit(actorId, "suggestion.approve", "organization_suggestion", id, org.id);
+    return org;
+  }
+
+  async rejectSuggestion(id: string, reason: string | null, actorId: string): Promise<void> {
+    const { data } = await this.privileged.from("organization_suggestions").select("detail").eq("id", id).single();
+    const detail = (((data as Row | null)?.detail ?? {}) as Record<string, unknown>);
+    detail.reviewReason = reason;
+    await this.privileged.from("organization_suggestions").update({ status: "rejected", detail }).eq("id", id);
+    await this.audit(actorId, "suggestion.reject", "organization_suggestion", id, reason ?? undefined);
   }
 
   // -------------------------------------------------------------------------

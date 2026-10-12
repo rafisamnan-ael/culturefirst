@@ -84,9 +84,14 @@ export default async function DirectoryPage({
       {result.items.length === 0 ? (
         <div className="mt-8 rounded-lg border border-dashed border-border bg-white p-12 text-center">
           <p className="text-sm text-muted-foreground">{t("directory.empty")}</p>
-          <Button asChild variant="outline" className="mt-4">
-            <Link href="/organizations">{t("common.retry")}</Link>
-          </Button>
+          <div className="mt-4 flex flex-wrap justify-center gap-2">
+            <Button asChild variant="outline">
+              <Link href="/organizations">{t("common.retry")}</Link>
+            </Button>
+            <Button asChild variant="outline">
+              <Link href="/suggest">Suggest this organization</Link>
+            </Button>
+          </div>
         </div>
       ) : (
         <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">

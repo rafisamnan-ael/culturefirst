@@ -56,3 +56,17 @@ export const moderationSchema = z.object({
   action: z.enum(["approve", "reject", "return"]),
   reason: z.string().max(500).optional(),
 });
+
+export const suggestionSchema = z.object({
+  suggestedName: z.string().min(2, "Please provide the organization name.").max(200),
+  suggestedBengaliName: z.string().max(200).optional(),
+  categoryId: z.string().min(1, "Please choose a category.").max(200),
+  division: z.string().max(100).optional(),
+  district: z.string().max(100).optional(),
+  city: z.string().max(100).optional(),
+  website: z.string().max(300).optional(),
+  address: z.string().max(500).optional(),
+  reason: z.string().max(1000).optional(),
+});
+
+export type SuggestionPayload = z.infer<typeof suggestionSchema>;

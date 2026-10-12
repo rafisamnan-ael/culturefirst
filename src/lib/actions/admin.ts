@@ -144,6 +144,33 @@ export async function updateOrganizationAction(input: {
 }
 
 // ---------------------------------------------------------------------------
+// Organization suggestions (manual add — requires admin approval)
+// ---------------------------------------------------------------------------
+export async function approveSuggestion(input: { id: string }): Promise<ActionResult> {
+  const user = await guard(ADMIN);
+  if (!user) return { ok: false, error: "FORBIDDEN" };
+  const store = await getStore();
+  try {
+    const org = await store.approveSuggestion(input.id, user.id);
+    refreshPublic(org.slug);
+    revalidatePath("/admin/suggestions");
+    return { ok: true };
+  } catch (e) {
+    const msg = e instanceof Error ? e.message : "FAILED";
+    return { ok: false, error: msg };
+  }
+}
+
+export async function rejectSuggestion(input: { id: string; reason?: string }): Promise<ActionResult> {
+  const user = await guard(ADMIN);
+  if (!user) return { ok: false, error: "FORBIDDEN" };
+  const store = await getStore();
+  await store.rejectSuggestion(input.id, input.reason ?? null, user.id);
+  revalidatePath("/admin/suggestions");
+  return { ok: true };
+}
+
+// ---------------------------------------------------------------------------
 // Categories & relationships
 // ---------------------------------------------------------------------------
 export async function createCategoryAction(input: {

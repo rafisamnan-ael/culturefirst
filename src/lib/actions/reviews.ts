@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { getStore } from "@/lib/data";
 import { getCurrentUser, requireUser } from "@/lib/auth";
-import { createReviewSchema, reportSchema, appealSchema, claimSchema, responseSchema } from "@/lib/validation/schemas";
+import { createReviewSchema, reportSchema, appealSchema, claimSchema, responseSchema, suggestionSchema } from "@/lib/validation/schemas";
 import { calculateReviewScore, toAnswerInputs } from "@/lib/scoring";
 import { scoreThresholds } from "@/lib/config";
 import { rateLimit } from "@/lib/rate-limit";
@@ -133,6 +133,29 @@ export async function requestClaim(input: unknown): Promise<ActionResult> {
     evidence: parsed.data.evidence,
   });
   return { ok: true };
+}
+
+export async function submitSuggestion(input: unknown): Promise<ActionResult<{ suggestionId: string }>> {
+  const user = await getCurrentUser();
+  const parsed = suggestionSchema.safeParse(input);
+  if (!parsed.success) {
+    return { ok: false, error: parsed.error.issues[0]?.message ?? "INVALID_INPUT" };
+  }
+  const payload = parsed.data;
+  const store = await getStore();
+  const suggestion = await store.createSuggestion({
+    suggestedName: payload.suggestedName.trim(),
+    suggestedBengaliName: payload.suggestedBengaliName?.trim() || null,
+    categoryId: payload.categoryId,
+    division: payload.division?.trim() || null,
+    district: payload.district?.trim() || null,
+    city: payload.city?.trim() || null,
+    website: payload.website?.trim() || null,
+    address: payload.address?.trim() || null,
+    reason: payload.reason?.trim() || null,
+    submittedByUserId: user?.id ?? null,
+  });
+  return { ok: true, data: { suggestionId: suggestion.id } };
 }
 
 export async function submitResponse(input: unknown): Promise<ActionResult> {
