@@ -41,6 +41,11 @@ export const dataSource = (process.env.DATA_SOURCE || "fixtures") as
   | "supabase"
   | "fixtures";
 
+/**
+ * Demo auth bypass (cookie-based) so your network can actually try the app
+ * without setting up Supabase. Only used when explicitly enabled (DEV_AUTH=true
+ * and DATA_SOURCE=fixtures). Production Supabase mode is unaffected.
+ */
 export const devAuth =
   (process.env.DEV_AUTH || "true") === "true" && dataSource === "fixtures";
 

@@ -64,7 +64,7 @@ export async function submitReview(input: unknown): Promise<ActionResult<{ revie
     relationshipTypeId: payload.relationshipTypeId,
     templateVersionId: bundle.version.id,
     title: payload.title ?? null,
-    body: payload.body,
+    body: (payload.body ?? "").trim() || "(Ratings only — no written review provided.)",
     employmentStage: null,
     experiencePeriod: payload.experiencePeriod ?? null,
     displayName: payload.displayName ?? null,

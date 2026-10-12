@@ -134,7 +134,6 @@ export function ReviewWizard({
   function canProceed(): boolean {
     if (step === 1) return !!relationshipId;
     if (step === 3) return !!liveScore?.eligible;
-    if (step === 4) return body.trim().length >= 40;
     if (step === 6) return agreed;
     return true;
   }
@@ -321,20 +320,22 @@ export function ReviewWizard({
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-charcoal">{t("review.step5")}</h2>
               <div className="space-y-2">
-                <Label htmlFor="title">{t("review.titleLabel")} <span className="text-muted-foreground">({t("common.optional")})</span></Label>
-                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} />
+                <Label htmlFor="title">{t("review.titleLabel")} <span className="text-muted-foreground">(optional)</span></Label>
+                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} placeholder={locale === "bn" ? "শিরোনাম (ঐচ্ছিক)" : "Headline (optional)"} />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="body">{t("review.bodyLabel")}</Label>
+                <Label htmlFor="body">Written experience <span className="text-muted-foreground">(optional)</span></Label>
                 <Textarea
                   id="body"
                   value={body}
                   onChange={(e) => setBody(e.target.value)}
                   maxLength={5000}
-                  rows={8}
-                  placeholder={locale === "bn" ? "আপনার বাস্তব অভিজ্ঞান বর্ণনা করুন…" : "Describe what you personally experienced…"}
+                  rows={6}
+                  placeholder={locale === "bn" ? "চাইলে আপনার অভিজ্ঞতা লিখুন (ঐচ্ছিক)…" : "If you want, write about what you experienced (optional)…"}
                 />
-                <p className="text-xs text-muted-foreground">{t("review.bodyHelp")}</p>
+                <p className="text-xs text-muted-foreground">
+                  {locale === "bn" ? "আপনার রেটিংই মুখ্য। লেখা ঐচ্ছিক, তবে যত বেশি বলবেন তত বোঝা সহজ হয়।" : "Your ratings are what matter most. The written review is optional."}
+                </p>
                 <p className="text-right text-xs text-muted-foreground">{body.length} / 5000</p>
               </div>
             </div>
@@ -344,15 +345,15 @@ export function ReviewWizard({
             <div className="space-y-4">
               <h2 className="text-lg font-semibold text-charcoal">{t("review.step6")}</h2>
               <div className="space-y-2">
-                <Label htmlFor="displayName">{t("review.displayNameLabel")}</Label>
+                <Label htmlFor="displayName">{t("review.displayNameLabel")} <span className="text-muted-foreground">(optional)</span></Label>
                 <Input
                   id="displayName"
                   value={displayName}
                   onChange={(e) => setDisplayName(e.target.value)}
                   maxLength={60}
-                  placeholder={locale === "bn" ? "যেমন: একজন কর্মী" : "e.g. A former employee"}
+                  placeholder={locale === "bn" ? "যেমন: একজন কর্মী (ঐচ্ছিক)" : "e.g. A former employee (optional)"}
                 />
-                <p className="text-xs text-muted-foreground">{t("review.displayNameHelp")}</p>
+                <p className="text-xs text-muted-foreground">{t("review.displayNameHelp")} · Optional — we&apos;ll use a pseudonym if left blank.</p>
               </div>
             </div>
           )}

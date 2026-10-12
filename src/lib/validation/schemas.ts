@@ -19,7 +19,7 @@ export const createReviewSchema = z.object({
   branchId: z.string().min(1).max(200).nullable().optional(),
   relationshipTypeId: z.string().min(1).max(200),
   title: z.string().max(140).nullable().optional(),
-  body: z.string().min(40, "Please describe your experience in at least 40 characters.").max(5000),
+  body: z.string().max(5000).optional().transform((s) => (s ?? "")),
   experiencePeriod: z.string().max(60).nullable().optional(),
   displayName: z.string().max(60).nullable().optional(),
   language: z.enum(["en", "bn", "mixed"]).default("en"),
