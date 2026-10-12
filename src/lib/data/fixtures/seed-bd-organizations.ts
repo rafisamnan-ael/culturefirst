@@ -17,12 +17,6 @@ import type {
   ReviewAnswer,
   ReviewScoreSnapshot,
 } from "@/types/domain";
-import {
-  aggregateReviews,
-  calculateReviewScore,
-  toAnswerInputs,
-} from "@/lib/scoring";
-import { scoreThresholds } from "@/lib/config";
 
 export interface SeedState {
   categories: OrganizationCategory[];
@@ -508,21 +502,22 @@ export function createSeedOrganizations(): Organization[] {
   return bangladeshiOrganizations.map((org, index) => ({
     id: `org-${index + 1}`,
     slug: org.slug,
-    name: org.name,
-    nameAlt: null,
+    officialName: org.name,
+    bengaliName: null,
+    alternateNames: [],
     categoryId: `cat-${org.category}`,
-    description: null,
-    websiteUrl: org.websiteUrl,
-    publicAddress: org.address,
+    parentOrganizationId: null,
+    description: { en: "", bn: "" },
+    website: org.websiteUrl,
+    address: org.address,
     division: org.division,
     district: org.district,
     city: org.city,
+    status: "active" as const,
     googleMapsUrl: null,
-    claim: {
-      status: "unclaimed",
-      claimedAt: null,
-      claimedBy: null,
-    },
+    googlePlaceId: null,
+    verified: false,
+    claimStatus: "unclaimed" as const,
     createdAt: now,
     updatedAt: now,
   }));
