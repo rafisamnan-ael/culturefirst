@@ -540,13 +540,11 @@ export function createSeedState(): SeedState {
       id: "admin",
       role: "admin",
       createdAt: now,
-      updatedAt: now,
     },
     {
       id: "reviewer",
       role: "user",
       createdAt: now,
-      updatedAt: now,
     },
   ];
   const reviews: Review[] = [];
