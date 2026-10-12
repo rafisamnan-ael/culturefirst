@@ -538,11 +538,15 @@ export function createSeedState(): SeedState {
   const profiles: Profile[] = [
     {
       id: "admin",
+      email: "admin@culturefirst.bd",
+      displayName: "Administrator",
       role: "admin",
       createdAt: now,
     },
     {
       id: "reviewer",
+      email: "reviewer@culturefirst.bd",
+      displayName: "Test Reviewer",
       role: "user",
       createdAt: now,
     },
