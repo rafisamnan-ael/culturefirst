@@ -4,7 +4,6 @@ import type { Metadata } from "next";
 import { ReviewWizard, type WizardBundle } from "@/components/review/review-wizard";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
-import { getCurrentUser } from "@/lib/auth";
 
 export const dynamic = "force-dynamic";
 
@@ -41,9 +40,7 @@ export default async function ReviewPage({ params }: { params: Promise<{ slug: s
     };
   }
 
-  // Guest can preview the wizard; actual submit checks auth (wizard gates the last step + server rejects).
-  const user = await getCurrentUser();
-
+  // Anyone can fill in and submit the review wizard — no sign-in required.
   return (
     <div className="container max-w-3xl py-10">
       <nav className="mb-4 text-sm text-muted-foreground">
@@ -64,7 +61,6 @@ export default async function ReviewPage({ params }: { params: Promise<{ slug: s
         branches={branches}
         relationships={relationships.map((r) => ({ id: r.id, name: r.name }))}
         bundles={bundles}
-        isAuthed={!!user}
       />
     </div>
   );

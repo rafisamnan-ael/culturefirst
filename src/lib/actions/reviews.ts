@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { headers } from "next/headers";
 import { getStore } from "@/lib/data";
 import { getCurrentUser, requireUser } from "@/lib/auth";
 import { createReviewSchema, reportSchema, appealSchema, claimSchema, responseSchema, suggestionSchema } from "@/lib/validation/schemas";
@@ -12,11 +13,19 @@ export type ActionResult<T = undefined> =
   | { ok: true; data?: T }
   | { ok: false; error: string };
 
+async function clientIp(): Promise<string> {
+  const h = await headers();
+  const fwd = h.get("x-forwarded-for");
+  return fwd ? fwd.split(",")[0].trim() : "unknown";
+}
+
 export async function submitReview(input: unknown): Promise<ActionResult<{ reviewId: string }>> {
   const user = await getCurrentUser();
-  if (!user) return { ok: false, error: "UNAUTHENTICATED" };
+  // Anyone can submit a review. Guests get an opaque identity; authenticated
+  // users keep their own id so duplicate detection and "my reviews" still work.
+  const userId = user?.id ?? `anon:${crypto.randomUUID()}`;
 
-  const limited = rateLimit(`review:${user.id}`, 5, 60 * 60 * 1000);
+  const limited = rateLimit(user ? `review:${user.id}` : `reviewip:${await clientIp()}`, 5, 60 * 60 * 1000);
   if (!limited.ok) return { ok: false, error: "RATE_LIMITED" };
 
   const parsed = createReviewSchema.safeParse(input);
@@ -46,18 +55,21 @@ export async function submitReview(input: unknown): Promise<ActionResult<{ revie
     return { ok: false, error: score.reason ?? "NOT_ELIGIBLE" };
   }
 
-  // Anti-duplicate: one active review per user/org/relationship.
-  const existing = await store.listReviews({
-    organizationId: org.id,
-    relationshipTypeId: payload.relationshipTypeId,
-    userId: user.id,
-    pageSize: 50,
-  });
-  const active = existing.items.find((r) => r.status === "pending" || r.status === "published");
-  if (active) return { ok: false, error: "DUPLICATE_REVIEW" };
+  // Anti-duplicate: one active review per authenticated user/org/relationship.
+  // Guests cannot be linked across submissions, so they are covered by the IP rate limit instead.
+  if (user) {
+    const existing = await store.listReviews({
+      organizationId: org.id,
+      relationshipTypeId: payload.relationshipTypeId,
+      userId: user.id,
+      pageSize: 50,
+    });
+    const active = existing.items.find((r) => r.status === "pending" || r.status === "published");
+    if (active) return { ok: false, error: "DUPLICATE_REVIEW" };
+  }
 
   const review = await store.createReview({
-    userId: user.id,
+    userId,
     organizationId: org.id,
     branchId: payload.branchId ?? null,
     categoryId: org.categoryId,

@@ -48,13 +48,11 @@ export function ReviewWizard({
   branches,
   relationships,
   bundles,
-  isAuthed,
 }: {
   organization: { id: string; slug: string; officialName: string; bengaliName: string | null };
   branches: OrganizationBranch[];
   relationships: WizardRelationship[];
   bundles: Record<string, WizardBundle>;
-  isAuthed: boolean;
 }) {
   const { t, locale } = useI18n();
   const { toast } = useToast();
@@ -157,7 +155,6 @@ export function ReviewWizard({
     setSubmitting(false);
     if (!result.ok) {
       const messages: Record<string, string> = {
-        UNAUTHENTICATED: "Please sign in to submit a review.",
         RATE_LIMITED: "You have submitted too many reviews recently. Please try again later.",
         DUPLICATE_REVIEW: "You already have an active review for this organization and perspective.",
         NO_TEMPLATE: "No rating template is configured for this perspective yet.",
@@ -376,14 +373,6 @@ export function ReviewWizard({
                 />
                 <span className="text-sm text-charcoal">{t("review.agree")}</span>
               </label>
-              {!isAuthed && (
-                <p className="rounded-md bg-navy/5 p-3 text-sm text-navy">
-                  {locale === "bn" ? "জমা দিতে সাইন ইন করতে হবে।" : "You must be signed in to submit a review."}{" "}
-                  <a href={`/login?next=${encodeURIComponent(`/organizations/${organization.slug}/review`)}`} className="font-medium text-jade underline">
-                    {t("nav.login")}
-                  </a>
-                </p>
-              )}
             </div>
           )}
 
@@ -402,7 +391,7 @@ export function ReviewWizard({
             <ChevronRight className="h-4 w-4" />
           </Button>
         ) : (
-          <Button variant="accent" onClick={handleSubmit} disabled={!agreed || !isAuthed || submitting}>
+          <Button variant="accent" onClick={handleSubmit} disabled={!agreed || submitting}>
             {submitting ? t("common.loading") : t("common.submit")}
           </Button>
         )}
