@@ -58,19 +58,19 @@ describe("fixture store integration", () => {
   });
 
   it("score cards returned for orgs", async () => {
-    const orgs = await store.listOrganizations({ pageSize: 5 });
-    const cards = await store.getScoreCards(orgs.items.map((o) => o.id));
+    const result = await store.listOrganizations({ search: "nexus", pageSize: 10 });
+    expect(result.items.length).toBeGreaterThan(0);
+    const cards = await store.getScoreCards(result.items.map((o) => o.id));
     expect(cards.length).toBeGreaterThan(0);
   });
 
   it("review creation + moderation flow", async () => {
-    // Use seed org for setup, but query with specific filtering
-    const seedOrgs = await store.listOrganizations({ pageSize: 1 });
-    const seedOrg = seedOrgs.items[0];
-    const cat = await store.getCategoryById(seedOrg.categoryId);
+    // Use the hospital patient perspective, which always has a published template.
+    const cat = await store.getCategoryBySlug("hospital-clinic");
     const rels = await store.listRelationshipsForCategory(cat!.id);
-    const rel = rels[0];
-    const bundle = await store.getTemplateBundle(cat!.id, rel.id);
+    const rel = rels.find((r) => r.slug === "patient");
+    expect(rel).toBeTruthy();
+    const bundle = await store.getTemplateBundle(cat!.id, rel!.id);
     expect(bundle).toBeTruthy();
 
     // Create a new test organization to avoid seed data interference
