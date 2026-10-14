@@ -48,7 +48,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               user={user ? { id: user.id, displayName: user.displayName, role: user.role } : null}
               devUsers={devUsers}
             />
-            <main className="flex-1">{children}</main>
+            <main className="flex-1 bg-soft/50 relative overflow-hidden">
+              <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-jade/5 blur-[120px]" />
+              <div className="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-navy/5 blur-[120px]" />
+              {children}
+            </main>
             <SiteFooter />
           </ToastProvider>
         </I18nProvider>
