@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, ShieldCheck, UserCircle2 } from "lucide-react";
+import { Menu, PenLine, ShieldCheck, UserCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { LanguageToggle } from "@/components/layout/language-toggle";
 import { useI18n } from "@/lib/i18n/provider";
@@ -66,6 +66,13 @@ export function SiteHeader({
         </div>
 
         <div className="flex items-center gap-3">
+          <Button asChild variant="accent" size="sm" className="font-semibold shadow-sm">
+            <Link href="/review" className="flex items-center gap-1.5">
+              <PenLine className="h-4 w-4" />
+              <span>{t("nav.writeReview")}</span>
+            </Link>
+          </Button>
+
           <LanguageToggle className="hidden sm:inline-flex" />
           {user ? (
             <div className="hidden items-center gap-2 sm:flex">
@@ -108,6 +115,14 @@ export function SiteHeader({
                 <DialogTitle>{brandName}</DialogTitle>
               </DialogHeader>
               <nav className="flex flex-col gap-1" aria-label="Mobile">
+                <Link
+                  href="/review"
+                  onClick={() => setOpen(false)}
+                  className="flex items-center gap-2 rounded-md bg-jade-highlight px-3 py-2.5 text-sm font-semibold text-navy hover:bg-jade-highlight/80 mb-2"
+                >
+                  <PenLine className="h-4 w-4 text-jade" />
+                  {t("nav.writeReview")}
+                </Link>
                 {NAV.map((item) => (
                   <Link
                     key={item.href}

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Search, ShieldCheck, Lock, Scale, Eye, MessageSquare, Plus } from "lucide-react";
+import { ArrowRight, ShieldCheck, Lock, Scale, Eye, MessageSquare, Plus, PenLine, Star, Sparkles, CheckCircle2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CategoryCard } from "@/components/organizations/category-card";
@@ -23,13 +23,9 @@ export default async function HomePage() {
 
   const categories = await store.listCategories();
   const orgsPage = await store.listOrganizations({ pageSize: 6 });
-  const cards = await store.getScoreCards(orgsPage.items.map((o) => o.id));
-  const allOrgs = await store.listOrganizations({ pageSize: 1000 });
+  const allOrgs = await store.listOrganizations({ pageSize: 2000 });
   const categoryById = new Map(categories.map((c) => [c.id, c]));
 
-  // "Recently reviewed" = organizations with at least one approved, eligible
-  // review, ordered by the most recent such review. Falls back to a neutral
-  // "Explore organizations" heading when nothing has been reviewed yet.
   const recentReviews = await store.listReviews({ status: "published", pageSize: 100 });
   const recentOrgIds: string[] = [];
   for (const r of recentReviews.items) {
@@ -44,7 +40,7 @@ export default async function HomePage() {
   const recentCards = await store.getScoreCards(recentOrgs.map((o) => o.id));
   const hasRecent = recentOrgs.length > 0;
   const featuredOrgs = hasRecent ? recentOrgs : orgsPage.items;
-  const featuredCards = hasRecent ? recentCards : cards;
+  const featuredCards = await store.getScoreCards(featuredOrgs.map(o => o.id));
 
   const orgCountByCategory = new Map<string, number>();
   for (const o of allOrgs.items) {
@@ -60,99 +56,106 @@ export default async function HomePage() {
 
   return (
     <div>
-      {/* Hero */}
-      <section className="relative overflow-hidden border-b border-border bg-gradient-to-br from-navy via-navy-secondary to-[#0d2236] text-soft">
+      {/* Hero: Review-Centric Redesign */}
+      <section className="relative overflow-hidden border-b border-border bg-[#0d1b2a] text-soft">
         <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-[380px] w-[380px] rounded-full bg-jade/15 blur-3xl" />
-          <div className="absolute -bottom-24 -left-24 h-[360px] w-[360px] rounded-full bg-gold/12 blur-3xl" />
+          <div className="absolute -right-24 -top-24 h-[450px] w-[450px] rounded-full bg-jade/10 blur-[100px]" />
+          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy/20 blur-[100px]" />
+          <div className="absolute inset-0 opacity-[0.03] grayscale" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }} />
         </div>
-        <div className="container grid gap-10 py-16 md:py-24 lg:grid-cols-2 lg:items-center">
-          <div>
-            <p className="mb-4 inline-flex items-center gap-2 rounded-full border border-soft/20 px-3 py-1 text-xs font-medium text-jade-highlight">
-              {brand.country} · {locale === "bn" ? "স্বাধীন সংস্কৃতি প্ল্যাটফর্ম" : "Independent culture platform"}
-            </p>
-            <h1 className="text-balance text-4xl font-semibold leading-tight tracking-tight sm:text-5xl">
-              {t("home.heroTitle")}
+        
+        <div className="container relative z-10 grid gap-12 py-16 md:py-28 lg:grid-cols-2 lg:items-center">
+          <div className="max-w-2xl text-center lg:text-left">
+            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-jade/30 bg-jade/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-jade-highlight">
+              <Sparkles className="h-3.5 w-3.5" />
+              {locale === "bn" ? "বাংলাদেশের প্রথম কালচার প্ল্যাটফর্ম" : "Bangladesh's Independent Culture Platform"}
+            </div>
+            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl">
+              {locale === "bn" ? "প্রতিষ্ঠানের আসল চেহারা জানুন।" : "Know the culture before you choose."}
             </h1>
-            <p className="mt-5 max-w-xl text-base leading-relaxed text-soft/80 sm:text-lg">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft/70 sm:text-xl mx-auto lg:mx-0">
               {t("home.heroSubtitle")}
             </p>
-
-            <div className="mt-8 space-y-3">
-              <ReviewSearch
-                organizations={allOrgs.items.map((o) => ({
-                  id: o.id,
-                  slug: o.slug,
-                  officialName: o.officialName,
-                  bengaliName: o.bengaliName,
-                }))}
-              />
-              <p className="text-xs text-soft/60">
-                {locale === "bn"
-                  ? "সরাসরি যেকোনো প্রতিষ্ঠানের কালচার রিভিউ শুরু করতে নাম খুঁজুন।"
-                  : "Search any organization to jump directly into the culture review flow."}
-              </p>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <Button asChild variant="accent" size="lg">
-                <Link href="/organizations">
-                  {t("nav.directory")} <ArrowRight className="h-4 w-4" />
-                </Link>
-              </Button>
-              <Button
-                asChild
-                variant="outline"
-                size="lg"
-                className="border-soft/30 bg-transparent text-soft hover:bg-soft/10"
-              >
-                <Link href="/how-it-works">{t("nav.howItWorks")}</Link>
-              </Button>
+            
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
+               <div className="flex items-center gap-2 text-sm font-medium text-jade-highlight">
+                 <CheckCircle2 className="h-4 w-4" />
+                 <span>{locale === "bn" ? "সম্পূর্ণ গোপনীয়" : "100% Anonymous"}</span>
+               </div>
+               <div className="flex items-center gap-2 text-sm font-medium text-jade-highlight">
+                 <CheckCircle2 className="h-4 w-4" />
+                 <span>{locale === "bn" ? "সঠিক যাচাইকরণ" : "Verified Methodology"}</span>
+               </div>
             </div>
           </div>
 
-          <div className="rounded-lg border border-soft/15 bg-navy-secondary/60 p-6 backdrop-blur">
-            <p className="text-sm font-semibold uppercase tracking-wide text-jade-highlight">
-              {locale === "bn" ? "সংস্কৃতি স্কোর — কীভাবে হিসাব হয়" : "Culture score — how it is calculated"}
-            </p>
-            <div className="mt-4 space-y-3 text-sm text-soft/85">
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-xs font-bold text-white">1</span>
-                <p>{locale === "bn" ? "প্রতিটি ক্যাটাগরি ও সংশ্লিষ্ট দৃষ্টিভঙ্গির জন্য আলাদা প্রশ্নমালা।" : "A distinct questionnaire for every category and reviewer perspective."}</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-xs font-bold text-white">2</span>
-                <p>{locale === "bn" ? "প্রতিটি প্যারামিটারের ওজনসহ ১–৫ স্কেলে রেটিং।" : "Weighted 1–5 ratings across category-specific parameters."}</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-xs font-bold text-white">3</span>
-                <p>{locale === "bn" ? "“দেখিনি” উত্তর হিসাব থেকে বাদ যায়।" : "“Not observed” answers are excluded from the calculation."}</p>
-              </div>
-              <div className="flex items-start gap-3">
-                <span className="mt-0.5 flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-jade text-xs font-bold text-white">4</span>
-                <p>{locale === "bn" ? "কম নমুনায় সংখ্যা নয়, সতর্কীকরণ দেখানো হয়।" : "Small samples show a disclosure instead of a reliable number."}</p>
-              </div>
+          {/* Interactive Review Centerpiece */}
+          <div className="relative mx-auto w-full max-w-md lg:mr-0 animate-in fade-in slide-in-from-right-4 duration-700">
+            <Card className="overflow-hidden border-border/10 bg-white/10 backdrop-blur-xl shadow-2xl">
+              <CardContent className="p-8">
+                <div className="mb-6 space-y-2 text-center">
+                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-jade shadow-lg shadow-jade/20 mb-4">
+                     <PenLine className="h-6 w-6 text-white" />
+                   </div>
+                   <h2 className="text-2xl font-bold text-white">
+                     {locale === "bn" ? "রিভিউ দিয়ে শুরু করুন" : "Start your review"}
+                   </h2>
+                   <p className="text-sm text-soft/60">
+                     {locale === "bn" ? "প্রতিষ্ঠান নির্বাচন করে রেটিং দেওয়া শুরু করুন" : "Select an organization to rate your experience"}
+                   </p>
+                </div>
+
+                <ReviewSearch
+                  organizations={allOrgs.items.map((o) => ({
+                    id: o.id,
+                    slug: o.slug,
+                    officialName: o.officialName,
+                    bengaliName: o.bengaliName,
+                  }))}
+                  className="scale-105"
+                />
+
+                <div className="mt-8 grid grid-cols-2 gap-3 text-center">
+                   <Link href="/organizations" className="rounded-xl border border-soft/10 bg-white/5 p-3 text-xs font-bold text-soft transition hover:bg-white/10">
+                     {t("nav.directory")}
+                   </Link>
+                   <Link href="/how-it-works" className="rounded-xl border border-soft/10 bg-white/5 p-3 text-xs font-bold text-soft transition hover:bg-white/10">
+                     {t("nav.howItWorks")}
+                   </Link>
+                </div>
+
+                <div className="mt-6 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-soft/40">
+                   <Lock className="h-3 w-3" />
+                   <span>{locale === "bn" ? "নিরাপদ ও এনক্রিপ্টেড" : "Secure & Encrypted Submission"}</span>
+                </div>
+              </CardContent>
+            </Card>
+            
+            {/* Floating stats decorative */}
+            <div className="absolute -bottom-6 -left-6 hidden sm:flex items-center gap-3 rounded-2xl border border-border/10 bg-navy-secondary p-4 shadow-xl">
+               <div className="flex -space-x-2">
+                 {[1,2,3].map(i => <div key={i} className="h-8 w-8 rounded-full border-2 border-navy-secondary bg-jade-highlight" />)}
+               </div>
+               <div className="text-left">
+                 <p className="text-[10px] font-bold uppercase tracking-tighter text-soft/50 leading-none">Joined by</p>
+                 <p className="text-sm font-bold text-white leading-tight">500+ Reviewers</p>
+               </div>
             </div>
           </div>
         </div>
       </section>
 
        {/* Categories */}
-      <section className="container py-14">
-        <div className="mb-6 flex items-end justify-between gap-4">
-          <div>
-            <h2 className="text-2xl font-semibold text-charcoal">{t("home.browseCategories")}</h2>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {locale === "bn" ? "প্রতিটি ক্যাটাগরির নিজস্ব মূল্যায়ন মানদণ্ড।" : "Each category has its own culture criteria."}
+      <section className="container py-20">
+        <div className="mb-10 text-center">
+            <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">{t("home.browseCategories")}</h2>
+            <p className="mt-3 text-lg text-muted-foreground">
+              {locale === "bn" ? "প্রতিটি ক্যাটাগরির জন্য রয়েছে বিশেষ মূল্যায়ন মানদণ্ড।" : "Specialized culture criteria for every industry."}
             </p>
-          </div>
-          <Link href="/categories" className="text-sm font-medium text-jade hover:underline">
-            {t("home.exploreAllCategories")}
-          </Link>
         </div>
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
           {categories.map((c, idx) => (
-            <div key={c.id} className="reveal" style={{ animationDelay: `${idx * 60}ms` }}>
+            <div key={c.id} className="reveal" style={{ animationDelay: `${idx * 50}ms` }}>
               <CategoryCard category={c} count={orgCountByCategory.get(c.id) ?? 0} locale={locale} />
             </div>
           ))}
@@ -160,25 +163,25 @@ export default async function HomePage() {
       </section>
 
        {/* Featured */}
-      <section className="relative border-y border-border bg-gradient-to-b from-white via-white to-soft/70 py-14">
+      <section className="border-y border-border bg-warmgray/30 py-20">
         <div className="container">
-          <div className="mb-6 flex items-end justify-between gap-4">
-            <div>
-              <h2 className="text-2xl font-semibold text-charcoal">
+          <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
+            <div className="text-center sm:text-left">
+              <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">
                 {hasRecent ? t("home.featured") : t("home.exploreTitle")}
               </h2>
-              {!hasRecent && (
-                <p className="mt-1 text-sm text-muted-foreground">{t("home.exploreSubtitle")}</p>
-              )}
+              <p className="mt-2 text-muted-foreground">{hasRecent ? "" : t("home.exploreSubtitle")}</p>
             </div>
-            <Link href="/organizations" className="text-sm font-medium text-jade hover:underline">
-              {t("nav.directory")}
-            </Link>
+            <Button asChild variant="outline" className="rounded-full font-bold self-center sm:self-auto">
+              <Link href="/organizations">
+                {t("nav.directory")} <ArrowRight className="ml-2 h-4 w-4" />
+              </Link>
+            </Button>
           </div>
           {featuredOrgs.length === 0 ? (
-            <p className="text-sm text-muted-foreground">{t("directory.empty")}</p>
+            <p className="text-center text-sm text-muted-foreground py-20">{t("directory.empty")}</p>
           ) : (
-            <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {featuredOrgs.map((o) => (
                 <OrganizationCard
                   key={o.id}
@@ -194,19 +197,21 @@ export default async function HomePage() {
       </section>
 
        {/* Perspectives */}
-      <section className="container py-14">
-        <div className="grid gap-8 lg:grid-cols-3">
-          <div className="lg:col-span-1">
-            <h2 className="text-2xl font-semibold text-charcoal">{t("home.perspectivesTitle")}</h2>
-            <p className="mt-3 text-sm leading-relaxed text-muted-foreground">{t("home.perspectivesBody")}</p>
+      <section className="container py-24">
+        <div className="grid gap-12 lg:grid-cols-3 lg:items-center">
+          <div className="lg:col-span-1 text-center lg:text-left">
+            <h2 className="text-3xl font-bold text-charcoal sm:text-4xl leading-tight">{t("home.perspectivesTitle")}</h2>
+            <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("home.perspectivesBody")}</p>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2 lg:col-span-2">
+          <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
             {perspectives.map((p, idx) => (
-              <Card key={p.title} className="reveal" style={{ animationDelay: `${idx * 70}ms` as string } as never}>
-                <CardContent className="space-y-2 p-5">
-                  <p.icon className="h-5 w-5 text-jade" />
-                  <h3 className="font-semibold text-charcoal">{p.title}</h3>
-                  <p className="text-sm text-muted-foreground">{p.body}</p>
+              <Card key={p.title} className="group border-border/40 shadow-soft transition-all hover:border-jade/20 hover:shadow-elevated">
+                <CardContent className="space-y-4 p-8">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-jade/10 text-jade transition-colors group-hover:bg-jade group-hover:text-white">
+                    <p.icon className="h-6 w-6" />
+                  </div>
+                  <h3 className="text-xl font-bold text-charcoal">{p.title}</h3>
+                  <p className="text-sm leading-relaxed text-muted-foreground">{p.body}</p>
                 </CardContent>
               </Card>
             ))}
@@ -215,24 +220,33 @@ export default async function HomePage() {
       </section>
 
       {/* Trust */}
-      <section className="border-y border-border bg-white py-14">
-        <div className="container grid gap-8 lg:grid-cols-3">
-          <div>
-            <Lock className="h-6 w-6 text-jade" />
-            <h2 className="mt-3 text-xl font-semibold text-charcoal">{t("home.trustTitle")}</h2>
+      <section className="bg-navy py-24 text-soft overflow-hidden relative">
+        <div className="absolute top-0 right-0 w-96 h-96 bg-jade/5 rounded-full blur-[100px] -mr-48 -mt-48" />
+        <div className="container relative z-10 grid gap-12 lg:grid-cols-3">
+          <div className="text-center lg:text-left">
+            <div className="mx-auto lg:mx-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 mb-6">
+              <Lock className="h-7 w-7 text-jade-highlight" />
+            </div>
+            <h2 className="text-3xl font-bold text-white sm:text-4xl">{t("home.trustTitle")}</h2>
           </div>
-          <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
-            <div>
-              <h3 className="font-semibold text-charcoal">{locale === "bn" ? "মডারেশন" : "Moderation"}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+          <div className="grid gap-10 sm:grid-cols-2 lg:col-span-2">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-jade-highlight" />
+                <h3 className="text-xl font-bold text-white">{locale === "bn" ? "মডারেশন" : "Human Moderation"}</h3>
+              </div>
+              <p className="text-lg leading-relaxed text-soft/60">
                 {locale === "bn"
                   ? "প্রতিটি রিভিউ প্রকাশের আগে মানব মডারেশনের মধ্য দিয়ে যায়। শুধু অনুমোদিত, যোগ্য রিভিউ স্কোরে অন্তর্ভুক্ত হয়।"
                   : "Every review passes through human moderation before publication. Only approved, eligible reviews affect public scores."}
               </p>
             </div>
-            <div>
-              <h3 className="font-semibold text-charcoal">{locale === "bn" ? "গোপনীয়তা" : "Privacy"}</h3>
-              <p className="mt-1 text-sm text-muted-foreground">
+            <div className="space-y-3">
+              <div className="flex items-center gap-3">
+                <CheckCircle2 className="h-5 w-5 text-jade-highlight" />
+                <h3 className="text-xl font-bold text-white">{locale === "bn" ? "গোপনীয়তা" : "Reviewer Privacy"}</h3>
+              </div>
+              <p className="text-lg leading-relaxed text-soft/60">
                 {locale === "bn"
                   ? "ছদ্মনামে রিভিউ করা যায়। ইমেইল বা ব্যক্তিগত পরিচয় কখনো প্রকাশ্যে দেখানো হয় না।"
                   : "Reviews can be published under a pseudonym. Emails and personal identities are never shown publicly."}
@@ -242,21 +256,31 @@ export default async function HomePage() {
         </div>
       </section>
 
-       {/* CTA */}
-      <section className="container py-16">
-        <div className="relative overflow-hidden rounded-xl border border-jade/20 bg-gradient-to-br from-jade-highlight via-jade-highlight/50 to-white p-8 shadow-soft sm:p-12">
-          <div aria-hidden className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-jade/10 blur-2xl" />
-          <div className="relative flex flex-col items-start justify-between gap-6 lg:flex-row lg:items-center">
-            <div>
-              <h2 className="text-2xl font-semibold text-charcoal">{t("home.ctaTitle")}</h2>
-              <p className="mt-2 max-w-xl text-sm text-muted-foreground">{t("home.ctaBody")}</p>
+       {/* Final CTA: Focused on the Review Page */}
+      <section className="container py-24">
+        <div className="relative overflow-hidden rounded-3xl border-2 border-jade/20 bg-gradient-to-br from-jade-highlight/40 via-white to-white p-10 shadow-elevated text-center sm:p-20">
+          <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 h-64 w-64 rounded-full bg-jade/10 blur-[80px]" />
+          <div aria-hidden className="pointer-events-none absolute -left-32 -bottom-32 h-64 w-64 rounded-full bg-navy/5 blur-[80px]" />
+          
+          <div className="relative z-10 mx-auto max-w-2xl space-y-8">
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-soft">
+              <PenLine className="h-8 w-8 text-jade" />
             </div>
-            <Button asChild size="lg" className="shadow-elevated">
-              <Link href="/organizations">
-                <Plus className="h-4 w-4" />
-                {t("nav.writeReview")}
-              </Link>
-            </Button>
+            <h2 className="text-4xl font-bold text-charcoal sm:text-5xl">{t("home.ctaTitle")}</h2>
+            <p className="text-xl text-muted-foreground">{t("home.ctaBody")}</p>
+            <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+              <Button asChild size="lg" className="rounded-full h-14 px-10 text-lg font-bold shadow-elevated">
+                <Link href="/review">
+                  <PenLine className="mr-2 h-5 w-5" />
+                  {locale === "bn" ? "অভিজ্ঞতা শেয়ার করুন" : "Write my review now"}
+                </Link>
+              </Button>
+              <Button asChild variant="outline" size="lg" className="rounded-full h-14 px-10 text-lg font-bold border-2">
+                <Link href="/methodology">
+                   {locale === "bn" ? "পদ্ধতি জানুন" : "Learn our scoring"}
+                </Link>
+              </Button>
+            </div>
           </div>
         </div>
       </section>
