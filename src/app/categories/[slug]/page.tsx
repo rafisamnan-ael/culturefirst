@@ -87,7 +87,7 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
               <CardContent className="p-5">
                 <div className="mb-3 flex flex-wrap items-center gap-2">
                   <h3 className="font-semibold text-charcoal">{pick(tpl.name, locale)}</h3>
-                  <Badge variant="outline">v{bundle?.version.version ?? "—"}</Badge>
+                  {bundle && <Badge variant="outline">v{bundle.version.version}</Badge>}
                 </div>
                 <p className="mb-3 text-xs text-muted-foreground">
                   {t("common.perspective")}:{" "}
@@ -96,14 +96,18 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
                     .filter(Boolean)
                     .join(", ")}
                 </p>
-                <ul className="space-y-1.5">
-                  {bundle?.parameters.map((p) => (
-                    <li key={p.id} className="flex items-center justify-between gap-3 text-sm">
-                      <span className="text-charcoal/90">{pick(p.name, locale)}</span>
-                      <span className="tabular-nums text-muted-foreground">{p.weight}%</span>
-                    </li>
-                  ))}
-                </ul>
+                {bundle ? (
+                  <ul className="space-y-1.5">
+                    {bundle.parameters.map((p) => (
+                      <li key={p.id} className="flex items-center justify-between gap-3 text-sm">
+                        <span className="text-charcoal/90">{pick(p.name, locale)}</span>
+                        <span className="tabular-nums text-muted-foreground">{p.weight}%</span>
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <p className="text-sm text-muted-foreground">{t("org.questionnaireUnavailable")}</p>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -111,11 +115,16 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
       </section>
 
       <section className="mt-12">
-        <div className="mb-5 flex items-end justify-between gap-4">
-          <h2 className="text-xl font-semibold text-charcoal">{t("category.orgsInCategory")}</h2>
+        <div className="mb-5 flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <h2 className="text-xl font-semibold text-charcoal">{t("category.orgsInCategory")}</h2>
+            <p className="mt-1 text-sm text-muted-foreground">
+              {t("category.showingOf", { shown: orgs.items.length, total: orgs.total })}
+            </p>
+          </div>
           <Button asChild variant="outline" size="sm">
             <Link href={`/organizations?category=${category.slug}`}>
-              {t("common.viewAll")} <ArrowRight className="h-4 w-4" />
+              {t("category.viewAllOrgs", { count: orgs.total })} <ArrowRight className="h-4 w-4" />
             </Link>
           </Button>
         </div>

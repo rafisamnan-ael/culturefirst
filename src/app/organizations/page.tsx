@@ -56,6 +56,8 @@ export default async function DirectoryPage({
   const cards = await store.getScoreCards(result.items.map((o) => o.id));
   const categoryById = new Map(categories.map((c) => [c.id, c]));
   const totalPages = Math.max(1, Math.ceil(result.total / result.pageSize));
+  const from = result.total === 0 ? 0 : (result.page - 1) * result.pageSize + 1;
+  const to = Math.min(result.page * result.pageSize, result.total);
 
   function pageHref(p: number) {
     const next = new URLSearchParams();
@@ -78,7 +80,7 @@ export default async function DirectoryPage({
       </Suspense>
 
       <p className="mt-6 text-sm text-muted-foreground">
-        {result.total} {t("directory.results")}
+        {t("directory.showing", { from, to, total: result.total })}
       </p>
 
       {result.items.length === 0 ? (
@@ -86,10 +88,10 @@ export default async function DirectoryPage({
           <p className="text-sm text-muted-foreground">{t("directory.empty")}</p>
           <div className="mt-4 flex flex-wrap justify-center gap-2">
             <Button asChild variant="outline">
-              <Link href="/organizations">{t("common.retry")}</Link>
+              <Link href="/organizations">{t("directory.clearFilters")}</Link>
             </Button>
             <Button asChild variant="outline">
-              <Link href="/suggest">Suggest this organization</Link>
+              <Link href="/suggest">{locale === "bn" ? "এই প্রতিষ্ঠান প্রস্তাব করুন" : "Suggest this organization"}</Link>
             </Button>
           </div>
         </div>

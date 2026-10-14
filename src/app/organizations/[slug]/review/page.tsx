@@ -1,7 +1,9 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
+import { ChevronLeft, Clock, ShieldAlert } from "lucide-react";
 import { ReviewWizard, type WizardBundle } from "@/components/review/review-wizard";
+import { Button } from "@/components/ui/button";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 
@@ -14,11 +16,12 @@ export const metadata: Metadata = {
 
 export default async function ReviewPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  const { t } = await getServerT();
+  const { t, locale } = await getServerT();
   const store = await getStore();
 
   const org = await store.getOrganizationBySlug(slug);
   if (!org || org.status === "merged") notFound();
+  if (org.slug !== slug) permanentRedirect(`/organizations/${org.slug}/review`);
 
   const branches = await store.listBranches(org.id);
   const relationships = await store.listRelationshipsForCategory(org.categoryId);
@@ -40,17 +43,57 @@ export default async function ReviewPage({ params }: { params: Promise<{ slug: s
     };
   }
 
-  // Anyone can fill in and submit the review wizard — no sign-in required.
+  // Unavailable questionnaire state: friendly explanation without sending into dead-end form
+  if (Object.keys(bundles).length === 0) {
+    return (
+      <div className="container max-w-2xl py-12">
+        <nav className="mb-6 text-sm text-muted-foreground">
+          <Link
+            href={`/organizations/${org.slug}`}
+            className="inline-flex items-center gap-1.5 text-jade hover:underline font-medium"
+          >
+            <ChevronLeft className="h-4 w-4" />
+            {org.officialName}
+          </Link>
+        </nav>
+        <div className="rounded-xl border border-border bg-white p-8 text-center shadow-card space-y-4">
+          <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-full bg-gold/10 text-gold">
+            <Clock className="h-7 w-7" />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-xl font-bold text-charcoal sm:text-2xl">
+              {t("review.reviewsComingSoon")}
+            </h1>
+            <p className="mx-auto max-w-md text-sm text-muted-foreground">
+              {t("review.reviewsComingSoonDesc")}
+            </p>
+          </div>
+          <div className="pt-2">
+            <Button asChild variant="outline">
+              <Link href={`/organizations/${org.slug}`}>
+                {t("review.backToOrg")}
+              </Link>
+            </Button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
-    <div className="container max-w-3xl py-10">
-      <nav className="mb-4 text-sm text-muted-foreground">
-        <Link href={`/organizations/${org.slug}`} className="hover:text-jade">
+    <div className="container max-w-3xl py-8 sm:py-12">
+      <nav className="mb-4 flex items-center text-sm text-muted-foreground">
+        <Link
+          href={`/organizations/${org.slug}`}
+          className="inline-flex items-center gap-1 hover:text-jade font-medium text-charcoal"
+        >
+          <ChevronLeft className="h-4 w-4" />
           {org.officialName}
         </Link>
         <span className="mx-2">/</span>
-        <span className="text-charcoal">{t("nav.writeReview")}</span>
+        <span className="text-muted-foreground">{t("nav.writeReview")}</span>
       </nav>
-      <h1 className="mb-6 text-2xl font-semibold tracking-tight text-charcoal">{t("nav.writeReview")}</h1>
+
       <ReviewWizard
         organization={{
           id: org.id,

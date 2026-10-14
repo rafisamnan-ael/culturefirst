@@ -8,7 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { useI18n } from "@/lib/i18n/provider";
 import { useToast } from "@/components/ui/toast";
-import { moderationAction, resolveReport, setAppealStatusAction, setClaimStatusAction } from "@/lib/actions/admin";
+import { moderationAction, resolveReport, setAppealStatusAction, setClaimStatusAction, setContactMessageStatusAction } from "@/lib/actions/admin";
 
 export function ModerationButtons({ reviewId }: { reviewId: string }) {
   const { t } = useI18n();
@@ -148,5 +148,29 @@ export function ClaimActions({ id }: { id: string }) {
         Reject
       </Button>
     </div>
+  );
+}
+
+export function MessageActions({ id, status }: { id: string; status: "open" | "resolved" }) {
+  const router = useRouter();
+  const { toast } = useToast();
+  const [busy, setBusy] = useState(false);
+  async function run(next: "open" | "resolved") {
+    setBusy(true);
+    const res = await setContactMessageStatusAction({ id, status: next });
+    setBusy(false);
+    if (res.ok) {
+      toast({ kind: "success", title: `Message marked ${next}` });
+      router.refresh();
+    }
+  }
+  return status === "open" ? (
+    <Button size="sm" variant="accent" disabled={busy} onClick={() => run("resolved")}>
+      Mark resolved
+    </Button>
+  ) : (
+    <Button size="sm" variant="outline" disabled={busy} onClick={() => run("open")}>
+      Reopen
+    </Button>
   );
 }

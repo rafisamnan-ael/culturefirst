@@ -2,12 +2,11 @@
 
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { Check, ChevronLeft, ChevronRight, Info } from "lucide-react";
+import { Check, ChevronLeft, ChevronRight, Info, Star } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
-import { Select } from "@/components/ui/select";
 import { Label } from "@/components/ui/label";
 import { Progress } from "@/components/ui/progress";
 import { RatingInput } from "@/components/review/rating-input";
@@ -17,6 +16,7 @@ import { useToast } from "@/components/ui/toast";
 import { submitReview } from "@/lib/actions/reviews";
 import { calculateReviewScore, toAnswerInputs } from "@/lib/scoring";
 import { scoreThresholds } from "@/lib/config";
+import { cn } from "@/lib/utils";
 import type { Bilingual, OrganizationBranch, RatingValue } from "@/types/domain";
 
 export interface WizardQuestion {
@@ -58,9 +58,9 @@ export function ReviewWizard({
   const { toast } = useToast();
   const router = useRouter();
 
-  const [step, setStep] = useState(0);
-  const [branchId, setBranchId] = useState<string>("");
+  const [stage, setStage] = useState(1);
   const [relationshipId, setRelationshipId] = useState<string>(relationships[0]?.id ?? "");
+  const [branchId, setBranchId] = useState<string>("");
   const [period, setPeriod] = useState("");
   const [answers, setAnswers] = useState<Record<string, RatingValue>>({});
   const [title, setTitle] = useState("");
@@ -72,14 +72,10 @@ export function ReviewWizard({
 
   const bundle = bundles[relationshipId];
 
-  const steps = [
-    t("review.step1"),
-    t("review.step2"),
-    t("review.step3"),
-    t("review.step4"),
-    t("review.step5"),
-    t("review.step6"),
-    t("review.step7"),
+  const stages = [
+    t("review.step2"), // About experience
+    t("review.step4"), // Rate
+    t("review.step5"), // Write & Submit
   ];
 
   // Draft preservation within the session (privacy-safe: sessionStorage only).
@@ -88,8 +84,8 @@ export function ReviewWizard({
       const raw = sessionStorage.getItem(`${DRAFT_KEY}_${organization.slug}`);
       if (raw) {
         const d = JSON.parse(raw);
-        setBranchId(d.branchId ?? "");
         setRelationshipId(d.relationshipId ?? relationships[0]?.id ?? "");
+        setBranchId(d.branchId ?? "");
         setPeriod(d.period ?? "");
         setAnswers(d.answers ?? {});
         setTitle(d.title ?? "");
@@ -129,15 +125,21 @@ export function ReviewWizard({
     );
   }, [bundle, answers]);
 
+  const answeredCount = bundle?.parameters.filter(p => answers[p.id] !== undefined && answers[p.id] !== null).length ?? 0;
+  const totalQuestions = bundle?.parameters.length ?? 0;
+
   function canProceed(): boolean {
-    if (step === 1) return !!relationshipId;
-    if (step === 3) return !!liveScore?.eligible;
-    if (step === 6) return agreed;
+    if (stage === 1) return !!relationshipId && !!period;
+    if (stage === 2) return !!liveScore?.eligible;
     return true;
   }
 
   async function handleSubmit() {
     if (!bundle) return;
+    if (!agreed) {
+      setError(locale === "bn" ? "দয়া করে কমিউনিটি নির্দেশিকা মেনে নিন।" : "Please agree to the community guidelines.");
+      return;
+    }
     setSubmitting(true);
     setError(null);
     const payload = {
@@ -173,88 +175,83 @@ export function ReviewWizard({
 
   return (
     <div className="space-y-6">
-      {/* Progress */}
-      <div>
-        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground">
-          <span>
-            {t("review.progress")} {step + 1} / {steps.length}
-          </span>
-          <span className="font-medium text-charcoal">{steps[step]}</span>
-        </div>
-        <Progress value={((step + 1) / steps.length) * 100} />
-        <ol className="mt-3 hidden flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground sm:flex">
-          {steps.map((s, i) => (
-            <li key={s} className={i === step ? "font-medium text-jade" : i < step ? "text-charcoal" : ""}>
-              {i < step && <Check className="mr-1 inline h-3 w-3" />}
-              {s}
-            </li>
-          ))}
-        </ol>
+      {/* Organization Header */}
+      <div className="flex flex-col gap-2">
+        <h1 className="text-2xl font-bold text-charcoal">{organization.officialName}</h1>
+        {organization.bengaliName && (
+          <p className="text-lg text-muted-foreground" lang="bn">{organization.bengaliName}</p>
+        )}
       </div>
 
-      <Card>
-        <CardContent className="space-y-5 p-6">
-          {step === 0 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.step1")}</h2>
-              <div className="rounded-md border border-border bg-warmgray/50 p-4">
-                <p className="font-medium text-charcoal">{organization.officialName}</p>
-                {organization.bengaliName && (
-                  <p className="text-sm text-muted-foreground" lang="bn">
-                    {organization.bengaliName}
-                  </p>
-                )}
-              </div>
-              {branches.length > 0 && (
-                <div className="space-y-2">
-                  <Label htmlFor="branch">{t("common.branch")}</Label>
-                  <Select id="branch" value={branchId} onChange={(e) => setBranchId(e.target.value)}>
-                    <option value="">{locale === "bn" ? "প্রধান কার্যালয় / নির্দিষ্ট নয়" : "Head office / not specific"}</option>
-                    {branches.map((b) => (
-                      <option key={b.id} value={b.id}>
-                        {b.name}
-                      </option>
-                    ))}
-                  </Select>
+      {/* Progress */}
+      <div>
+        <div className="mb-2 flex items-center justify-between text-xs text-muted-foreground uppercase tracking-wider font-semibold">
+          <span>{t("review.progress")} {stage} / 3</span>
+          <span className="text-jade">{stages[stage - 1]}</span>
+        </div>
+        <Progress value={(stage / 3) * 100} className="h-2" />
+      </div>
+
+      <Card className="border-border/60 shadow-soft">
+        <CardContent className="p-6">
+          {stage === 1 && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-bottom-2 duration-300">
+              <div className="space-y-4">
+                <Label className="text-base font-semibold">{t("review.relationshipQuestion")}</Label>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {relationships.map((r) => {
+                    const isSelected = relationshipId === r.id;
+                    const available = !!bundles[r.id];
+                    return (
+                      <button
+                        key={r.id}
+                        type="button"
+                        disabled={!available}
+                        onClick={() => {
+                          if (available) {
+                            setRelationshipId(r.id);
+                            // Reset answers if perspective changes
+                            if (relationshipId !== r.id) setAnswers({});
+                          }
+                        }}
+                        className={cn(
+                          "relative flex flex-col items-start rounded-xl border-2 p-4 text-left transition-all duration-200",
+                          !available && "opacity-50 grayscale cursor-not-allowed",
+                          isSelected 
+                            ? "border-jade bg-jade-highlight shadow-sm ring-1 ring-jade/20" 
+                            : "border-border bg-white hover:border-jade/30 hover:bg-warmgray/30"
+                        )}
+                      >
+                        <span className={cn("text-sm font-bold", isSelected ? "text-navy" : "text-charcoal")}>
+                          {pick(r.name, locale)}
+                        </span>
+                        {!available && (
+                          <span className="mt-1 text-[10px] text-muted-foreground font-medium uppercase tracking-tighter">
+                            {t("org.tabInsufficient")}
+                          </span>
+                        )}
+                        {isSelected && (
+                          <div className="absolute right-3 top-3 rounded-full bg-jade p-1">
+                            <Check className="h-3 w-3 text-white" strokeWidth={3} />
+                          </div>
+                        )}
+                      </button>
+                    );
+                  })}
                 </div>
-              )}
-            </div>
-          )}
-
-          {step === 1 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.relationshipQuestion")}</h2>
-              <div className="grid gap-2 sm:grid-cols-2">
-                {relationships.map((r) => (
-                  <button
-                    key={r.id}
-                    type="button"
-                    onClick={() => setRelationshipId(r.id)}
-                    className={`rounded-md border px-4 py-3 text-left text-sm transition-colors ${
-                      relationshipId === r.id
-                        ? "border-jade bg-jade-highlight text-navy"
-                        : "border-border bg-white text-charcoal hover:bg-warmgray"
-                    }`}
-                  >
-                    {pick(r.name, locale)}
-                  </button>
-                ))}
               </div>
-            </div>
-          )}
 
-          {step === 2 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.periodQuestion")}</h2>
-              <div className="space-y-2">
-                <Label htmlFor="period">{t("review.step3")}</Label>
+              <div className="space-y-3">
+                <Label htmlFor="period" className="text-base font-semibold">{t("review.periodQuestion")}</Label>
                 <Input
                   id="period"
                   value={period}
                   onChange={(e) => setPeriod(e.target.value)}
                   placeholder={t("review.periodPreset")}
+                  className="h-12 border-2 focus-visible:ring-jade"
                 />
-                <p className="text-xs text-muted-foreground">
+                <p className="flex items-start gap-2 text-xs text-muted-foreground">
+                  <Info className="h-3.5 w-3.5 shrink-0 text-jade mt-0.5" />
                   {locale === "bn"
                     ? "ব্যক্তিগত পরিচয় রক্ষার জন্য মোটামুটি সময়কালই যথেষ্ট।"
                     : "An approximate period is sufficient; we avoid granular details that could identify you."}
@@ -263,32 +260,38 @@ export function ReviewWizard({
             </div>
           )}
 
-          {step === 3 && (
-            <div className="space-y-5">
-              <div>
-                <h2 className="text-lg font-semibold text-charcoal">{t("review.step4")}</h2>
-                <p className="mt-1 text-sm text-muted-foreground">
-                  {locale === "bn"
-                    ? "আপনি সরাসরি যে বিষয়গুলো অনুভব করেননি সেগুলো “দেখিনি” নির্বাচন করুন।"
-                    : "Select “Not observed” for anything you did not directly experience."}
-                </p>
+          {stage === 2 && (
+            <div className="space-y-6 animate-in fade-in slide-in-from-right-2 duration-300">
+              <div className="flex items-center justify-between">
+                <div>
+                  <h2 className="text-lg font-bold text-charcoal">{t("review.step4")}</h2>
+                  <p className="text-sm text-muted-foreground">
+                    {answeredCount} {locale === "bn" ? "টির উত্তর দেওয়া হয়েছে" : "of"} {totalQuestions} {locale === "bn" ? "প্রশ্ন" : "questions answered"}
+                  </p>
+                </div>
+                {liveScore?.eligible && (
+                   <div className="flex items-center gap-1.5 rounded-full bg-jade/10 px-3 py-1 text-jade">
+                     <Star className="h-4 w-4 fill-current" />
+                     <span className="text-sm font-bold">{liveScore.score?.toFixed(2)}</span>
+                   </div>
+                )}
               </div>
+
               {!bundle ? (
-                <p className="text-sm text-muted-foreground">{t("org.noReviews")}</p>
+                <div className="rounded-lg bg-warmgray/30 p-8 text-center">
+                  <p className="text-sm text-muted-foreground">{t("org.noReviews")}</p>
+                </div>
               ) : (
-                <div className="space-y-6">
+                <div className="divide-y divide-border/40">
                   {bundle.parameters.map((p) => (
-                    <div key={p.id} className="space-y-3 rounded-md border border-border p-4">
-                      <div className="flex items-start justify-between gap-3">
-                        <div>
-                          <Label className="text-base">{pick(p.name, locale)}</Label>
-                          {p.questions.map((q) => (
-                            <p key={q.id} className="mt-1 text-sm text-muted-foreground">
-                              {pick(q.text, locale)}
-                            </p>
-                          ))}
-                        </div>
-                        <span className="shrink-0 text-xs font-medium text-muted-foreground">{p.weight}%</span>
+                    <div key={p.id} className="py-6 first:pt-0 last:pb-0">
+                      <div className="mb-4">
+                        <Label className="text-base font-bold text-charcoal">{pick(p.name, locale)}</Label>
+                        {p.questions.map((q) => (
+                          <p key={q.id} className="mt-1 text-sm leading-relaxed text-muted-foreground">
+                            {pick(q.text, locale)}
+                          </p>
+                        ))}
                       </div>
                       <RatingInput
                         label={pick(p.name, locale)}
@@ -297,102 +300,151 @@ export function ReviewWizard({
                       />
                     </div>
                   ))}
-                  {liveScore && !liveScore.eligible && (
-                    <p className="flex items-start gap-2 rounded-md bg-gold/10 p-3 text-xs text-[#7a5f2e]">
-                      <Info className="mt-0.5 h-3.5 w-3.5" />
-                      {t("review.needMore")}
-                    </p>
-                  )}
-                  {liveScore?.eligible && (
-                    <p className="text-sm text-jade">
-                      {locale === "bn" ? "প্রাথমিক স্কোর" : "Provisional score"}: {liveScore.score?.toFixed(2)} / 5
-                    </p>
-                  )}
+                </div>
+              )}
+
+              {liveScore && !liveScore.eligible && (
+                <div className="rounded-xl bg-gold/10 p-4 border border-gold/20">
+                  <div className="flex gap-3">
+                    <Info className="h-5 w-5 shrink-0 text-gold" />
+                    <div>
+                      <p className="text-sm font-semibold text-[#7a5f2e]">{locale === "bn" ? "আরও রেটিং প্রয়োজন" : "More ratings needed"}</p>
+                      <p className="mt-1 text-xs text-[#7a5f2e]/80 leading-relaxed">
+                        {t("review.needMore")}
+                      </p>
+                    </div>
+                  </div>
                 </div>
               )}
             </div>
           )}
 
-          {step === 4 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.step5")}</h2>
-              <div className="space-y-2">
-                <Label htmlFor="title">{t("review.titleLabel")} <span className="text-muted-foreground">(optional)</span></Label>
-                <Input id="title" value={title} onChange={(e) => setTitle(e.target.value)} maxLength={140} placeholder={locale === "bn" ? "শিরোনাম (ঐচ্ছিক)" : "Headline (optional)"} />
+          {stage === 3 && (
+            <div className="space-y-8 animate-in fade-in slide-in-from-right-2 duration-300">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="title" className="text-base font-bold">{t("review.titleLabel")} <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <Input 
+                    id="title" 
+                    value={title} 
+                    onChange={(e) => setTitle(e.target.value)} 
+                    maxLength={140} 
+                    className="h-11 border-2"
+                    placeholder={locale === "bn" ? "আপনার অভিজ্ঞতার একটি সংক্ষিপ্ত শিরোনাম দিন" : "Give your experience a short headline"} 
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="body" className="text-base font-bold">{t("review.bodyLabel")} <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <Textarea
+                    id="body"
+                    value={body}
+                    onChange={(e) => setBody(e.target.value)}
+                    maxLength={5000}
+                    rows={6}
+                    className="border-2 resize-none"
+                    placeholder={locale === "bn" ? "কী ভালো ছিল? কী আরও উন্নত করা যেত? আপনার অভিজ্ঞতা বিস্তারিত লিখুন..." : "What went well? What could be improved? Write about your experience..."}
+                  />
+                  <div className="flex justify-between text-[10px] uppercase tracking-widest font-bold text-muted-foreground">
+                    <span>{t("review.bodyHelp")}</span>
+                    <span className={cn(body.length > 4500 ? "text-destructive" : "")}>{body.length} / 5000</span>
+                  </div>
+                </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="body">Written experience <span className="text-muted-foreground">(optional)</span></Label>
-                <Textarea
-                  id="body"
-                  value={body}
-                  onChange={(e) => setBody(e.target.value)}
-                  maxLength={5000}
-                  rows={6}
-                  placeholder={locale === "bn" ? "চাইলে আপনার অভিজ্ঞতা লিখুন (ঐচ্ছিক)…" : "If you want, write about what you experienced (optional)…"}
-                />
-                <p className="text-xs text-muted-foreground">
-                  {locale === "bn" ? "আপনার রেটিংই মুখ্য। লেখা ঐচ্ছিক, তবে যত বেশি বলবেন তত বোঝা সহজ হয়।" : "Your ratings are what matter most. The written review is optional."}
-                </p>
-                <p className="text-right text-xs text-muted-foreground">{body.length} / 5000</p>
+
+              <div className="space-y-4 pt-4 border-t border-border/60">
+                <div className="space-y-2">
+                  <Label htmlFor="displayName" className="text-base font-bold">{t("review.displayNameLabel")} <span className="text-muted-foreground font-normal">(optional)</span></Label>
+                  <Input
+                    id="displayName"
+                    value={displayName}
+                    onChange={(e) => setDisplayName(e.target.value)}
+                    maxLength={60}
+                    className="h-11 border-2"
+                    placeholder={locale === "bn" ? "যেমন: একজন বর্তমান কর্মী" : "e.g. A current employee"}
+                  />
+                  <p className="text-xs text-muted-foreground">{t("review.displayNameHelp")}</p>
+                </div>
+
+                <div className="space-y-4 pt-4">
+                  <h3 className="text-sm font-bold uppercase tracking-wider text-charcoal">{t("review.rulesTitle")}</h3>
+                  <ul className="grid gap-2 text-sm text-muted-foreground">
+                    {[
+                      locale === "bn" ? "শুধু বাস্তব অভিজ্ঞতা লিখুন।" : "Write only about firsthand experience.",
+                      locale === "bn" ? "ব্যক্তিগত তথ্য (নাম, ইমেইল) প্রকাশ করবেন না।" : "No private info (names, emails).",
+                      locale === "bn" ? "হুমকি বা হয়রানি নিষিদ্ধ।" : "No threats or harassment.",
+                    ].map((rule, idx) => (
+                      <li key={idx} className="flex gap-2">
+                        <Check className="h-4 w-4 shrink-0 text-jade mt-0.5" />
+                        <span>{rule}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <label className={cn(
+                    "flex items-start gap-4 rounded-xl border-2 p-4 transition-all duration-200 cursor-pointer",
+                    agreed ? "border-jade bg-jade-highlight shadow-sm" : "border-border bg-white hover:border-jade/30"
+                  )}>
+                    <input
+                      type="checkbox"
+                      checked={agreed}
+                      onChange={(e) => {
+                        setAgreed(e.target.checked);
+                        if (e.target.checked) setError(null);
+                      }}
+                      className="mt-1 h-5 w-5 rounded border-2 border-border text-jade focus:ring-jade"
+                    />
+                    <span className="text-sm font-medium leading-tight text-charcoal">{t("review.agree")}</span>
+                  </label>
+                </div>
               </div>
             </div>
           )}
 
-          {step === 5 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.step6")}</h2>
-              <div className="space-y-2">
-                <Label htmlFor="displayName">{t("review.displayNameLabel")} <span className="text-muted-foreground">(optional)</span></Label>
-                <Input
-                  id="displayName"
-                  value={displayName}
-                  onChange={(e) => setDisplayName(e.target.value)}
-                  maxLength={60}
-                  placeholder={locale === "bn" ? "যেমন: একজন কর্মী (ঐচ্ছিক)" : "e.g. A former employee (optional)"}
-                />
-                <p className="text-xs text-muted-foreground">{t("review.displayNameHelp")} · Optional — we&apos;ll use a pseudonym if left blank.</p>
-              </div>
+          {error && (
+            <div className="mt-6 flex items-start gap-3 rounded-lg bg-destructive/10 p-4 text-sm font-medium text-destructive animate-in shake duration-300">
+               <Info className="h-5 w-5 shrink-0" />
+               <p>{error}</p>
             </div>
           )}
-
-          {step === 6 && (
-            <div className="space-y-4">
-              <h2 className="text-lg font-semibold text-charcoal">{t("review.rulesTitle")}</h2>
-              <ul className="list-inside list-disc space-y-1 text-sm text-muted-foreground">
-                <li>{locale === "bn" ? "শুধু বাস্তব অভিজ্ঞতা লিখুন।" : "Write only about firsthand experience."}</li>
-                <li>{locale === "bn" ? "ব্যক্তিগত নাম, ইমেইল বা ফোন নম্বর প্রকাশ করবেন না।" : "Do not publish private names, emails or phone numbers."}</li>
-                <li>{locale === "bn" ? "হুমকি বা লক্ষ্যবস্তু হয়রানি নিষিদ্ধ।" : "Threats and targeted harassment are prohibited."}</li>
-                <li>{locale === "bn" ? "প্রমাণহীন অভিযোগ তথ্য হিসেবে উপস্থাপন করবেন না।" : "Do not present unproven allegations as facts."}</li>
-              </ul>
-              <label className="flex items-start gap-3 rounded-md border border-border p-4">
-                <input
-                  type="checkbox"
-                  checked={agreed}
-                  onChange={(e) => setAgreed(e.target.checked)}
-                  className="mt-1 h-4 w-4 rounded border-border text-jade focus:ring-ring"
-                />
-                <span className="text-sm text-charcoal">{t("review.agree")}</span>
-              </label>
-            </div>
-          )}
-
-          {error && <p className="rounded-md bg-destructive/10 p-3 text-sm text-destructive">{error}</p>}
         </CardContent>
       </Card>
 
-      <div className="flex items-center justify-between gap-3">
-        <Button variant="outline" onClick={() => setStep((s) => Math.max(0, s - 1))} disabled={step === 0 || submitting}>
-          <ChevronLeft className="h-4 w-4" />
+      <div className="flex items-center justify-between gap-4 pt-2">
+        <Button 
+          variant="outline" 
+          size="lg" 
+          onClick={() => setStage((s) => Math.max(1, s - 1))} 
+          disabled={stage === 1 || submitting}
+          className="flex-1 h-12 rounded-xl border-2 font-bold"
+        >
+          <ChevronLeft className="mr-2 h-5 w-5" />
           {t("common.back")}
         </Button>
-        {step < steps.length - 1 ? (
-          <Button onClick={() => setStep((s) => s + 1)} disabled={!canProceed()}>
+        
+        {stage < 3 ? (
+          <Button 
+            size="lg"
+            onClick={() => setStage((s) => s + 1)} 
+            disabled={!canProceed()}
+            className="flex-1 h-12 rounded-xl bg-navy hover:bg-navy-secondary font-bold"
+          >
             {t("common.next")}
-            <ChevronRight className="h-4 w-4" />
+            <ChevronRight className="ml-2 h-5 w-5" />
           </Button>
         ) : (
-          <Button variant="accent" onClick={handleSubmit} disabled={!agreed || submitting}>
-            {submitting ? t("common.loading") : t("common.submit")}
+          <Button 
+            variant="accent" 
+            size="lg"
+            onClick={handleSubmit} 
+            disabled={!agreed || submitting}
+            className="flex-[1.5] h-12 rounded-xl font-bold shadow-elevated"
+          >
+            {submitting ? (
+              <span className="flex items-center gap-2">
+                <div className="h-4 w-4 animate-spin rounded-full border-2 border-white/30 border-t-white" />
+                {t("common.loading")}
+              </span>
+            ) : t("common.submit")}
           </Button>
         )}
       </div>

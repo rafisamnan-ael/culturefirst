@@ -1,4 +1,4 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import type { Metadata } from "next";
 import { ClaimForm } from "@/components/review/claim-form";
 import { getStore } from "@/lib/data";
@@ -15,6 +15,7 @@ export default async function ClaimPage({ params }: { params: Promise<{ slug: st
   const store = await getStore();
   const org = await store.getOrganizationBySlug(slug);
   if (!org) notFound();
+  if (org.slug !== slug) permanentRedirect(`/organizations/${org.slug}/claim`);
 
   const user = await getCurrentUser();
   if (!user) {

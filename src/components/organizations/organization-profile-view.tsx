@@ -36,6 +36,7 @@ export interface ProfilePerspective {
   score: number | null;
   eligibleCount: number;
   sufficiency: Sufficiency;
+  questionnaireAvailable: boolean;
   distribution: Record<string, number>;
   parameters: ProfileParameter[];
   strengths: ProfileParameter[];
@@ -91,6 +92,10 @@ export function OrganizationProfileView({
 
       {!active ? (
         <p className="text-sm text-muted-foreground">{t("org.noReviews")}</p>
+      ) : !active.questionnaireAvailable ? (
+        <div className="rounded-lg border border-border bg-white p-6">
+          <p className="text-sm text-muted-foreground">{t("org.questionnaireUnavailable")}</p>
+        </div>
       ) : (
         <>
           <div className="grid gap-6 lg:grid-cols-3">
@@ -218,17 +223,22 @@ export function OrganizationProfileView({
       <section className="grid gap-4 sm:grid-cols-2">
         <Card>
           <CardContent className="p-5">
-            <h3 className="font-semibold text-charcoal">{t("org.viewOnGoogle")}</h3>
+            <h3 className="font-semibold text-charcoal">
+              {googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
+            </h3>
             <p className="mt-1 text-xs text-muted-foreground">{t("org.googleSeparate")}</p>
             <div className="mt-3">
               <Button asChild variant="outline" size="sm">
                 <a
-                  href={googleMapsUrl ?? `https://www.google.com/search?q=${encodeURIComponent(slug + " Google reviews")}`}
+                  href={
+                    googleMapsUrl ??
+                    `https://www.google.com/search?q=${encodeURIComponent(slug + " Bangladesh")}`
+                  }
                   target="_blank"
-                  rel="noopener noreferrer nofollow"
+                  rel="noopener noreferrer"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  {t("org.viewOnGoogle")}
+                  {googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
                 </a>
               </Button>
             </div>
@@ -244,7 +254,7 @@ export function OrganizationProfileView({
             </p>
             <div className="mt-3">
               <Button asChild variant="outline" size="sm">
-                <Link href="/contact">
+                <Link href={`/contact?org=${encodeURIComponent(slug)}&reason=incorrect-info`}>
                   <Flag className="h-4 w-4" />
                   {t("org.reportIncorrect")}
                 </Link>

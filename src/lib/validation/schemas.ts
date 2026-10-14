@@ -70,3 +70,16 @@ export const suggestionSchema = z.object({
 });
 
 export type SuggestionPayload = z.infer<typeof suggestionSchema>;
+
+export const contactSchema = z.object({
+  name: z.string().min(2, "Please provide your name.").max(120),
+  email: z.string().email("Please provide a valid email address.").max(200),
+  topic: z.string().max(60).optional(),
+  subject: z.string().max(200).optional(),
+  message: z.string().min(10, "Please provide at least a short message.").max(3000),
+  organizationId: z.string().max(200).optional(),
+  organizationName: z.string().max(200).optional(),
+  locale: z.enum(["en", "bn"]).optional(),
+});
+
+export type ContactPayload = z.infer<typeof contactSchema>;

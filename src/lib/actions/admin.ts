@@ -306,6 +306,18 @@ export async function setClaimStatusAction(input: {
   return { ok: true };
 }
 
+export async function setContactMessageStatusAction(input: {
+  id: string;
+  status: "open" | "resolved";
+}): Promise<ActionResult> {
+  const user = await guard(STAFF);
+  if (!user) return { ok: false, error: "FORBIDDEN" };
+  const store = await getStore();
+  await store.setContactMessageStatus(input.id, input.status, user.id);
+  revalidatePath("/admin/messages");
+  return { ok: true };
+}
+
 export async function updateSettingsAction(input: {
   brandName?: string;
   tagline?: string;

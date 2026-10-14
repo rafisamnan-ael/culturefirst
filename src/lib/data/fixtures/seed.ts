@@ -65,6 +65,7 @@ interface TemplateSeed {
   relationshipSlugs: string[];
   nameEn: string;
   nameBn: string;
+  draft?: boolean;
   params: ParamSeed[];
 }
 
@@ -130,8 +131,8 @@ export const categorySeeds: Array<{ slug: string; en: string; bn: string; icon: 
     bn: "বিদ্যালয়",
     icon: "school",
     isFallback: false,
-    descEn: "Schools and madrasas. Uses the general organizational culture template until a dedicated school methodology is configured.",
-    descBn: "বিদ্যালয় ও মাদ্রাসা। নির্দিষ্ট বিদ্যালয় পদ্ধতি কনফিগার না হওয়া পর্যন্ত সাধারণ সাংগঠনিক সংস্কৃতি টেমপ্লেট ব্যবহার করে।",
+    descEn: "Schools and madrasas. Student, former-student, parent or guardian, and staff perspectives are kept separate — a dedicated school questionnaire is being prepared.",
+    descBn: "বিদ্যালয় ও মাদ্রাসা। শিক্ষার্থী, সাবেক শিক্ষার্থী, অভিভাবক ও কর্মীদের দৃষ্টিভঙ্গি আলাদা রাখা হয় — একটি নির্দিষ্ট বিদ্যালয় প্রশ্নমালা প্রস্তুত করা হচ্ছে।",
   },
   {
     slug: "bank-financial",
@@ -139,8 +140,8 @@ export const categorySeeds: Array<{ slug: string; en: string; bn: string; icon: 
     bn: "ব্যাংক বা আর্থিক প্রতিষ্ঠান",
     icon: "banknote",
     isFallback: false,
-    descEn: "Banks and financial institutions. Uses the general organizational culture template until a dedicated methodology is configured.",
-    descBn: "ব্যাংক ও আর্থিক প্রতিষ্ঠান। নির্দিষ্ট পদ্ধতি কনফিগার না হওয়া পর্যন্ত সাধারণ টেমপ্লেট ব্যবহার করে।",
+    descEn: "Banks and financial institutions. A dedicated questionnaire for this category is being prepared before public rollout.",
+    descBn: "ব্যাংক ও আর্থিক প্রতিষ্ঠান। প্রকাশের আগে এই ক্যাটাগরির জন্য একটি নির্দিষ্ট প্রশ্নমালা প্রস্তুত করা হচ্ছে।",
   },
   {
     slug: "retail-commercial",
@@ -148,8 +149,8 @@ export const categorySeeds: Array<{ slug: string; en: string; bn: string; icon: 
     bn: "খুচরা বা বাণিজ্যিক প্রতিষ্ঠান",
     icon: "store",
     isFallback: false,
-    descEn: "Retail and commercial establishments. Uses the general organizational culture template until a dedicated methodology is configured.",
-    descBn: "খুচরা ও বাণিজ্যিক প্রতিষ্ঠান। নির্দিষ্ট পদ্ধতি কনফিগার না হওয়া পর্যন্ত সাধারণ টেমপ্লেট ব্যবহার করে।",
+    descEn: "Retail and commercial establishments. A dedicated questionnaire for this category is being prepared before public rollout.",
+    descBn: "খুচরা ও বাণিজ্যিক প্রতিষ্ঠান। প্রকাশের আগে এই ক্যাটাগরির জন্য একটি নির্দিষ্ট প্রশ্নমালা প্রস্তুত করা হচ্ছে।",
   },
   {
     slug: "other",
@@ -172,6 +173,7 @@ export const relationshipSeeds: Array<{ slug: string; en: string; bn: string; ki
   { slug: "patient-attendant", en: "Patient attendant", bn: "রোগীর সহকারী", kind: "patient" },
   { slug: "student", en: "Student", bn: "শিক্ষার্থী", kind: "student" },
   { slug: "former-student", en: "Former student", bn: "সাবেক শিক্ষার্থী", kind: "student" },
+  { slug: "parent-guardian", en: "Parent or guardian", bn: "অভিভাবক", kind: "other" },
   { slug: "faculty", en: "Faculty member", bn: "শিক্ষক", kind: "other" },
   { slug: "admin-staff", en: "Administrative staff", bn: "প্রশাসনিক কর্মী", kind: "employee" },
   { slug: "citizen", en: "Citizen", bn: "নাগরিক", kind: "citizen" },
@@ -187,7 +189,7 @@ export const categoryRelationshipSeeds: Record<string, string[]> = {
   "university-college": ["student", "former-student", "faculty", "admin-staff"],
   "government-office": ["citizen", "visitor", "government-employee"],
   "ngo-nonprofit": ["beneficiary", "current-employee", "volunteer"],
-  "school": ["current-employee", "former-employee"],
+  "school": ["student", "former-student", "parent-guardian", "current-employee", "former-employee"],
   "bank-financial": ["current-employee", "former-employee"],
   "retail-commercial": ["current-employee", "former-employee"],
   "other": ["current-employee", "former-employee"],
@@ -353,6 +355,55 @@ export const templateSeeds: TemplateSeed[] = [
       { key: "conduct", en: "Professional conduct", bn: "পেশাদার আচরণ", weight: 15, questions: [] },
     ],
   },
+  {
+    slug: "school-student",
+    categorySlug: "school",
+    relationshipSlugs: ["student", "former-student"],
+    nameEn: "School Student Experience",
+    nameBn: "বিদ্যালয় শিক্ষার্থী অভিজ্ঞান",
+    draft: true,
+    params: [
+      { key: "teacher-respect", en: "Teacher respect toward students", bn: "শিক্ষকদের প্রতি শিক্ষার্থীর সম্মান", weight: 20, questions: [q("Do teachers treat students respectfully?", "শিক্ষকরা শিক্ষার্থীদের সাথে সম্মানের সাথে ব্যবহার করেন?")] },
+      { key: "dignity", en: "Student dignity and antibullying", bn: "শিক্ষার্থীর মর্যাদা ও হয়রানিমুক্ত পরিবেশ", weight: 20, questions: [q("Do students feel safe from mockery or humiliation?", "শিক্ষার্থীরা উপহাস বা অবমাননার ভয় থেকে মুক্ত বোধ করে?")] },
+      { key: "fairness", en: "Fair and equal treatment", bn: "ন্যায্য ও সমান আচরণ", weight: 15, questions: [q("Are students treated equally regardless of background?", "পটভূমি নির্বিশেষে শিক্ষার্থীদের সাথে সমানভাবে আচরণ করা হয়?")] },
+      { key: "speak-up", en: "Freedom to raise concerns", bn: "উদ্বেগ জানানোর স্বাধীনতা", weight: 15, questions: [q("Can students safely raise problems to teachers or staff?", "শিক্ষার্থীরা নিরাপদে শিক্ষক বা কর্মীদের কাছে সমস্যা জানাতে পারে?")] },
+      { key: "communication", en: "Clear communication", bn: "স্পষ্ট যোগাযোগ", weight: 10, questions: [] },
+      { key: "grievance", en: "Complaint handling", bn: "অভিযোগ নিষ্পত্তি", weight: 10, questions: [] },
+      { key: "inclusion", en: "Inclusion and acceptance", bn: "অন্তর্ভুক্তি ও গ্রহণযোগ্যতা", weight: 10, questions: [] },
+    ],
+  },
+  {
+    slug: "school-parent",
+    categorySlug: "school",
+    relationshipSlugs: ["parent-guardian"],
+    nameEn: "School Parent & Guardian Experience",
+    nameBn: "বিদ্যালয় অভিভাবক অভিজ্ঞান",
+    draft: true,
+    params: [
+      { key: "respect", en: "Respectful treatment of families", bn: "পরিবারের প্রতি সম্মানজনক আচরণ", weight: 20, questions: [] },
+      { key: "communication", en: "Communication with parents", bn: "অভিভাবকের সাথে যোগাযোগ", weight: 20, questions: [] },
+      { key: "fairness", en: "Fair and equal treatment of students", bn: "শিক্ষার্থীদের প্রতি ন্যায্য ও সমান আচরণ", weight: 20, questions: [] },
+      { key: "safety", en: "Student safety and care", bn: "শিক্ষার্থীর নিরাপত্তা ও যত্ন", weight: 20, questions: [] },
+      { key: "responsiveness", en: "Responsiveness to concerns", bn: "উদ্বেগে সাড়া", weight: 20, questions: [] },
+    ],
+  },
+  {
+    slug: "school-employee",
+    categorySlug: "school",
+    relationshipSlugs: ["current-employee", "former-employee"],
+    nameEn: "School Workplace Culture",
+    nameBn: "বিদ্যালয় কর্মক্ষেত্র সংস্কৃতি",
+    draft: true,
+    params: [
+      { key: "leadership", en: "Leadership and supervisor respect", bn: "নেতৃত্ব ও সুপারভাইজার সম্মান", weight: 20, questions: [] },
+      { key: "respect", en: "Workplace respect", bn: "কর্মক্ষেত্রে সম্মান", weight: 20, questions: [] },
+      { key: "fairness", en: "Workplace fairness", bn: "কর্মক্ষেত্রে ন্যায্যতা", weight: 15, questions: [] },
+      { key: "safety", en: "Safety to raise concerns", bn: "উদ্বেগ জানানোর নিরাপত্তা", weight: 15, questions: [] },
+      { key: "teamwork", en: "Teamwork and communication", bn: "দলগত কাজ ও যোগাযোগ", weight: 10, questions: [] },
+      { key: "grievance", en: "Internal complaint handling", bn: "অভ্যন্তরীণ অভিযোগ নিষ্পত্তি", weight: 10, questions: [] },
+      { key: "care", en: "Recognition and care for staff", bn: "কর্মীদের প্রতি স্বীকৃতি ও যত্ন", weight: 10, questions: [] },
+    ],
+  },
 ];
 
 export const organizationSeeds: Array<{
@@ -368,6 +419,8 @@ export const organizationSeeds: Array<{
   website?: string;
   googleMapsUrl?: string;
   branches?: Array<{ name: string; city: string; district: string }>;
+  alternateNames?: string[];
+  aliases?: string[];
 }> = [
   {
     slug: "sample-nexus-technologies",
@@ -462,10 +515,9 @@ export const organizationSeeds: Array<{
   { slug: "akij-group", en: "Akij Group", bn: "আকিজ গ্রুপ", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A large Bangladeshi industrial conglomerate.", descriptionBn: "একটি বড় বাংলাদেশি শিল্প কনগ্লোমারেট।", website: "https://www.akij.net" },
 
   // --- Hospitals & Clinics ---
-  { slug: "apollo-hospitals-dhaka", en: "Apollo Hospitals Dhaka", bn: "অ্যাপোলো হাসপাতাল ঢাকা", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A leading private hospital in Dhaka.", descriptionBn: "ঢাকার একটি শীর্ষস্থানীয় বেসরকারি হাসপাতাল।", website: "https://www.apollodhaka.com" },
   { slug: "united-hospital-dhaka", en: "United Hospital", bn: "ইউনাইটেড হাসপাতাল", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A private hospital in Dhaka.", descriptionBn: "ঢাকার একটি বেসরকারি হাসপাতাল।", website: "https://www.unitedhospital.com.bd" },
   { slug: "square-hospital", en: "Square Hospital", bn: "স্কয়ার হাসপাতাল", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A private hospital in Dhaka.", descriptionBn: "ঢাকার একটি বেসরকারি হাসপাতাল।", website: "https://www.squarehospital.com" },
-  { slug: "evercare-hospital-dhaka", en: "Evercare Hospital Dhaka", bn: "এভারকেয়ার হাসপাতাল ঢাকা", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A private tertiary hospital in Dhaka.", descriptionBn: "ঢাকার একটি বেসরকারি টারশিয়ারি হাসপাতাল।", website: "https://www.evercarebd.com" },
+  { slug: "evercare-hospital-dhaka", en: "Evercare Hospital Dhaka", bn: "এভারকেয়ার হাসপাতাল ঢাকা", alternateNames: ["Apollo Hospitals Dhaka", "অ্যাপোলো হাসপাতাল ঢাকা"], aliases: ["apollo-hospitals-dhaka"], categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A private tertiary hospital in Bashundhara Residential Area, Dhaka.", descriptionBn: "ঢাকার বাশুন্ডারা আবাসিক এলাকায় অবস্থিত একটি বেসরকারি টারশিয়ারি হাসপাতাল।", website: "https://www.evercarebd.com/en/dhaka" },
   { slug: "labaid-specialized-hospital", en: "LabAid Specialized Hospital", bn: "ল্যাবএইড স্পেশালাইজড হাসপাতাল", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A specialized private hospital in Dhaka.", descriptionBn: "ঢাকার একটি বিশেষায়িত বেসরকারি হাসপাতাল।", website: "https://www.labaid.com" },
   { slug: "square-hospital-limited", en: "Popular Diagnostic Centre", bn: "পপুলার ডায়াগনস্টিক সেন্টার", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A diagnostic and hospital chain in Bangladesh.", descriptionBn: "বাংলাদেশের একটি ডায়াগনস্টিক ও হাসপাতাল চেইন।", website: "https://www.populardiagnostic.com" },
 
@@ -512,12 +564,12 @@ export const organizationSeeds: Array<{
   { slug: "walton-hitech-industries-plc", en: "Walton Hi-Tech Industries PLC", bn: "Walton Hi-Tech Industries PLC", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi private company.", descriptionBn: "একটি বাংলাদেশি বেসরকারি প্রতিষ্ঠান।", website: "https://waltonbd.com" },
   { slug: "bangla-academy", en: "Bangla Academy", bn: "Bangla Academy", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://banglaacademy.gov.bd" },
   { slug: "bangladesh-agricultural-development-corporation", en: "Bangladesh Agricultural Development Corporation", bn: "Bangladesh Agricultural Development Corporation", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://badc.gov.bd" },
-  { slug: "bangladesh-agricultural-research-institute", en: "Bangladesh Agricultural Research Institute", bn: "Bangladesh Agricultural Research Institute", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://bari.gov.bd" },
+  { slug: "bangladesh-agricultural-research-institute", en: "Bangladesh Agricultural Research Institute", bn: "বাংলাদেশ কৃষি গবেষণা ইনস্টিটিউট", categorySlug: "government-office", division: "Dhaka", district: "Gazipur", city: "Gazipur", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://bari.gov.bd" },
   { slug: "bangladesh-bridge-authority", en: "Bangladesh Bridge Authority", bn: "Bangladesh Bridge Authority", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://bba.gov.bd" },
   { slug: "bangladesh-competition-commission", en: "Bangladesh Competition Commission", bn: "Bangladesh Competition Commission", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://ccb.gov.bd" },
   { slug: "bangladesh-copyright-office", en: "Bangladesh Copyright Office", bn: "Bangladesh Copyright Office", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://copyrightoffice.gov.bd" },
   { slug: "bangladesh-economic-zones-authority", en: "Bangladesh Economic Zones Authority", bn: "Bangladesh Economic Zones Authority", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://beza.portal.gov.bd" },
-  { slug: "bangladesh-fisheries-research-institute", en: "Bangladesh Fisheries Research Institute", bn: "Bangladesh Fisheries Research Institute", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://fri.gov.bd" },
+  { slug: "bangladesh-fisheries-research-institute", en: "Bangladesh Fisheries Research Institute", bn: "বাংলাদেশ মৎস্য গবেষণা ইনস্টিটিউট", categorySlug: "government-office", division: "Mymensingh", district: "Mymensingh", city: "Mymensingh", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://fri.gov.bd" },
   { slug: "bangladesh-jute-research-institute", en: "Bangladesh Jute Research Institute", bn: "Bangladesh Jute Research Institute", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://bjri.gov.bd" },
   { slug: "bangladesh-livestock-research-institute", en: "Bangladesh Livestock Research Institute", bn: "Bangladesh Livestock Research Institute", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://blri.gov.bd" },
   { slug: "bangladesh-meteorological-department", en: "Bangladesh Meteorological Department", bn: "Bangladesh Meteorological Department", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://bmd.gov.bd" },
@@ -581,26 +633,14 @@ export const organizationSeeds: Array<{
   { slug: "trading-corporation-of-bangladesh", en: "Trading Corporation of Bangladesh", bn: "Trading Corporation of Bangladesh", categorySlug: "government-office", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi government office or public institution.", descriptionBn: "একটি বাংলাদেশি সরকারি দফতর/প্রতিষ্ঠান।", website: "https://tcb.gov.bd" },
   { slug: "asgar-ali-hospital", en: "Asgar Ali Hospital", bn: "Asgar Ali Hospital", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://asgaralihospital.com" },
   { slug: "bangladesh-specialized-hospital", en: "Bangladesh Specialized Hospital", bn: "Bangladesh Specialized Hospital", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.bdspecializedhospital.com" },
-  { slug: "ibn-sina-cancer-diagnostic-center-dhanmondi", en: "Ibn Sina Cancer Diagnostic Center Dhanmondi", bn: "Ibn Sina Cancer Diagnostic Center Dhanmondi", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-consultation-center-badda", en: "Ibn Sina Diagnostic and Consultation Center Badda", bn: "Ibn Sina Diagnostic and Consultation Center Badda", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-consultation-center-bogura", en: "Ibn Sina Diagnostic and Consultation Center Bogura", bn: "Ibn Sina Diagnostic and Consultation Center Bogura", categorySlug: "hospital-clinic", division: "Rajshahi", district: "Bogura", city: "Bogura", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-consultation-center-jatrabari", en: "Ibn Sina Diagnostic and Consultation Center Jatrabari", bn: "Ibn Sina Diagnostic and Consultation Center Jatrabari", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-consultation-center-rajshahi", en: "Ibn Sina Diagnostic and Consultation Center Rajshahi", bn: "Ibn Sina Diagnostic and Consultation Center Rajshahi", categorySlug: "hospital-clinic", division: "Rajshahi", district: "Rajshahi", city: "Rajshahi", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-consultation-center-uttara", en: "Ibn Sina Diagnostic and Consultation Center Uttara", bn: "Ibn Sina Diagnostic and Consultation Center Uttara", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-and-imaging-center-dhanmondi", en: "Ibn Sina Diagnostic and Imaging Center Dhanmondi", bn: "Ibn Sina Diagnostic and Imaging Center Dhanmondi", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-diagnostic-center-lalbagh", en: "Ibn Sina Diagnostic Center Lalbagh", bn: "Ibn Sina Diagnostic Center Lalbagh", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-hospital-and-diagnostic-center-bogura", en: "Ibn Sina Hospital and Diagnostic Center Bogura", bn: "Ibn Sina Hospital and Diagnostic Center Bogura", categorySlug: "hospital-clinic", division: "Rajshahi", district: "Bogura", city: "Bogura", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-hospital-and-diagnostic-center-jashore", en: "Ibn Sina Hospital and Diagnostic Center Jashore", bn: "Ibn Sina Hospital and Diagnostic Center Jashore", categorySlug: "hospital-clinic", division: "Khulna", district: "Jashore", city: "Jashore", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-hospital-and-diagnostic-center-noakhali", en: "Ibn Sina Hospital and Diagnostic Center Noakhali", bn: "Ibn Sina Hospital and Diagnostic Center Noakhali", categorySlug: "hospital-clinic", division: "Chattogram", district: "Noakhali", city: "Noakhali", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-medical-college-hospital-kallyanpur", en: "Ibn Sina Medical College Hospital Kallyanpur", bn: "Ibn Sina Medical College Hospital Kallyanpur", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
-  { slug: "ibn-sina-specialized-hospital-dhanmondi", en: "Ibn Sina Specialized Hospital Dhanmondi", bn: "Ibn Sina Specialized Hospital Dhanmondi", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.ibnsinatrust.com" },
+
   { slug: "labaid-cardiac-hospital", en: "Labaid Cardiac Hospital", bn: "Labaid Cardiac Hospital", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://www.labaid.com.bd" },
   { slug: "national-heart-foundation-hospital-and-research-institute", en: "National Heart Foundation Hospital and Research Institute", bn: "National Heart Foundation Hospital and Research Institute", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A hospital or clinic in Bangladesh.", descriptionBn: "বাংলাদেশের একটি হাসপাতাল/ক্লিনিক।", website: "https://epidemiology.nhf.org.bd" },
   { slug: "azimpur-government-girls-school-and-college", en: "Azimpur Government Girls School and College", bn: "Azimpur Government Girls School and College", categorySlug: "school", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://aggsc.edu.bd" },
   { slug: "barishal-government-model-school-and-college", en: "Barishal Government Model School and College", bn: "Barishal Government Model School and College", categorySlug: "school", division: "Barishal", district: "Barishal", city: "Barishal", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://bgmsc.edu.bd" },
   { slug: "chattogram-model-school-and-college", en: "Chattogram Model School and College", bn: "Chattogram Model School and College", categorySlug: "school", division: "Chattogram", district: "Chattogram", city: "Chattogram", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://cmsc.edu.bd" },
   { slug: "dhaka-residential-model-college", en: "Dhaka Residential Model College", bn: "Dhaka Residential Model College", categorySlug: "school", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://drmc.edu.bd" },
-  { slug: "government-kalachandpur-high-secondary-school", en: "Government Kalachandpur High Secondary School", bn: "Government Kalachandpur High Secondary School", categorySlug: "school", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://gkumb.edu.bd" },
+  { slug: "government-kalachandpur-high-secondary-school", en: "Govt. Kalachandpur High School and College", bn: "সরকারি কালাচাঁদপুর হাই স্কুল অ্যান্ড কলেজ", alternateNames: ["Government Kalachandpur High Secondary School", "Government Kalachandpur High School and College"], categorySlug: "school", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A government high school and college in Kalachandpur, Gulshan, Dhaka (EIIN 108038).", descriptionBn: "গুলশান, ঢাকার কালাচাঁদপুরে অবস্থিত একটি সরকারি উচ্চ বিদ্যালয় ও কলেজ (EIIN 108038)।", website: "https://www.gkhscgulshan.edu.bd/" },
   { slug: "ideal-school-and-college-motijheel", en: "Ideal School and College Motijheel", bn: "Ideal School and College Motijheel", categorySlug: "school", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://iscm.edu.bd" },
   { slug: "rajshahi-education-board-model-school-and-college", en: "Rajshahi Education Board Model School and College", bn: "Rajshahi Education Board Model School and College", categorySlug: "school", division: "Rajshahi", district: "Rajshahi", city: "Rajshahi", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://rebmsc.edu.bd" },
   { slug: "rajshahi-model-school-and-college", en: "Rajshahi Model School and College", bn: "Rajshahi Model School and College", categorySlug: "school", division: "Rajshahi", district: "Rajshahi", city: "Rajshahi", descriptionEn: "A school or college in Bangladesh.", descriptionBn: "বাংলাদেশের একটি স্কুল/কলেজ।", website: "https://rmscraj.edu.bd" },
@@ -977,9 +1017,9 @@ export function createSeedState(): SeedState {
       id: versionId,
       templateId,
       version: 1,
-      status: "published",
-      changeNote: "Initial seeded version",
-      publishedAt: now,
+      status: t.draft ? "draft" : "published",
+      changeNote: t.draft ? null : "Initial seeded version",
+      publishedAt: t.draft ? null : now,
       createdAt: now,
     });
     t.params.forEach((p, idx) => {
@@ -1011,7 +1051,7 @@ export function createSeedState(): SeedState {
     slug: o.slug,
     officialName: o.en,
     bengaliName: o.bn,
-    alternateNames: [],
+    alternateNames: o.alternateNames ?? [],
     categoryId: catBySlug.get(o.categorySlug)!.id,
     parentOrganizationId: null,
     description: bid(o.descriptionEn, o.descriptionBn),
@@ -1032,6 +1072,13 @@ export function createSeedState(): SeedState {
   const aliases: OrganizationAlias[] = [];
   const branches: OrganizationBranch[] = [];
   for (const o of organizationSeeds) {
+    (o.aliases ?? []).forEach((alias, i) => {
+      aliases.push({
+        id: `al-${o.slug}-${i}`,
+        organizationId: `org-${o.slug}`,
+        alias,
+      });
+    });
     (o.branches ?? []).forEach((b, i) => {
       branches.push({
         id: `br-${o.slug}-${i}`,

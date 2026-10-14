@@ -2,6 +2,7 @@ import "server-only";
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import type {
   AuditLog,
+  ContactMessage,
   ModerationAction,
   Organization,
   OrganizationBranch,
@@ -975,6 +976,53 @@ export class SupabaseStore implements Store {
     detail.reviewReason = reason;
     await this.privileged.from("organization_suggestions").update({ status: "rejected", detail }).eq("id", id);
     await this.audit(actorId, "suggestion.reject", "organization_suggestion", id, reason ?? undefined);
+  }
+
+  // -------------------------------------------------------------------------
+  // Contact messages / correction requests
+  // -------------------------------------------------------------------------
+  async createContactMessage(
+    input: Omit<ContactMessage, "id" | "createdAt" | "status">,
+  ): Promise<ContactMessage> {
+    const { data, error } = await this.privileged.from("contact_messages").insert({
+      organization_id: input.organizationId,
+      organization_name: input.organizationName,
+      name: input.name,
+      email: input.email,
+      topic: input.topic,
+      subject: input.subject,
+      message: input.message,
+      locale: input.locale,
+      status: "open",
+    }).select("*").single();
+    const row = this.must(data as Row | null, error, "contact message");
+    return this.contactMessage(row);
+  }
+
+  async listContactMessages(): Promise<ContactMessage[]> {
+    const { data } = await this.privileged.from("contact_messages").select("*").order("created_at", { ascending: false });
+    return ((data ?? []) as Row[]).map((r) => this.contactMessage(r));
+  }
+
+  async setContactMessageStatus(id: string, status: "open" | "resolved", actorId: string): Promise<void> {
+    await this.privileged.from("contact_messages").update({ status }).eq("id", id);
+    await this.audit(actorId, `message.${status}`, "contact_message", id);
+  }
+
+  private contactMessage(r: Row): ContactMessage {
+    return {
+      id: str(r.id),
+      organizationId: nullable<string>(r.organization_id),
+      organizationName: nullable<string>(r.organization_name),
+      name: str(r.name),
+      email: str(r.email),
+      topic: str(r.topic),
+      subject: nullable<string>(r.subject),
+      message: str(r.message),
+      locale: nullable<string>(r.locale),
+      status: (str(r.status) === "resolved" ? "resolved" : "open"),
+      createdAt: iso(r.created_at),
+    };
   }
 
   // -------------------------------------------------------------------------

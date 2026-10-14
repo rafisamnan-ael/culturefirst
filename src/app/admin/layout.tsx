@@ -1,7 +1,7 @@
 import { redirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { LayoutDashboard, Building2, Tags, FileSliders, ShieldAlert, BadgeCheck, Settings, ClipboardList } from "lucide-react";
+import { LayoutDashboard, Building2, Tags, FileSliders, ShieldAlert, BadgeCheck, Settings, ClipboardList, Mail, Gauge } from "lucide-react";
 import { getCurrentUser, isStaff } from "@/lib/auth";
 import { getServerT } from "@/lib/i18n/server";
 
@@ -16,6 +16,8 @@ const NAV = [
   { href: "/admin/categories", key: "admin.categories", icon: Tags },
   { href: "/admin/templates", key: "admin.templates", icon: FileSliders },
   { href: "/admin/claims", key: "admin.claims", icon: BadgeCheck },
+  { href: "/admin/messages", key: "admin.messages", icon: Mail },
+  { href: "/admin/quality", key: "admin.quality", icon: Gauge },
   { href: "/admin/settings", key: "admin.settings", icon: Settings },
 ];
 

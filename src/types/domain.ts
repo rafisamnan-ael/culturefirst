@@ -248,6 +248,22 @@ export interface OrganizationSuggestion {
   createdAt: string;
 }
 
+export type ContactMessageStatus = "open" | "resolved";
+
+export interface ContactMessage {
+  id: string;
+  organizationId: string | null;
+  organizationName: string | null;
+  name: string;
+  email: string;
+  topic: string;
+  subject: string | null;
+  message: string;
+  locale: string | null;
+  status: ContactMessageStatus;
+  createdAt: string;
+}
+
 export interface OrganizationRepresentative {
   id: string;
   organizationId: string;

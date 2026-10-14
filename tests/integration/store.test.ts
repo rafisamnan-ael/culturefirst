@@ -31,7 +31,7 @@ describe("fixture store integration", () => {
     const cats = await store.listCategories();
     expect(cats.length).toBeGreaterThan(0);
     const rels = await store.listRelationships();
-    expect(rels.length).toBe(14);
+    expect(rels.length).toBe(15);
   });
 
   it("finds hospital category", async () => {

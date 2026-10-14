@@ -4,6 +4,7 @@ import path from "node:path";
 import { randomUUID } from "node:crypto";
 import type {
   AuditLog,
+  ContactMessage,
   ModerationAction,
   Organization,
   OrganizationBranch,
@@ -50,6 +51,7 @@ interface Db extends SeedState {
   representatives: OrganizationRepresentative[];
   moderationActions: ModerationAction[];
   suggestions: OrganizationSuggestion[];
+  messages: ContactMessage[];
 }
 
 const DATA_DIR = path.join(process.cwd(), ".data");
@@ -113,9 +115,11 @@ export class FixtureStore implements Store {
         representatives: [],
         moderationActions: [],
         suggestions: [],
+        messages: [],
       };
     }
     if (!db.suggestions) db.suggestions = [];
+    if (!db.messages) db.messages = [];
     const store = new FixtureStore(db);
     store.recomputeAll();
     if (!db.aggregates.length) store.recomputeAll();
@@ -448,7 +452,11 @@ export class FixtureStore implements Store {
   }
 
   async getOrganizationBySlug(slug: string): Promise<Organization | null> {
-    return this.db.organizations.find((o) => o.slug === slug) ?? null;
+    const org = this.db.organizations.find((o) => o.slug === slug);
+    if (org) return org;
+    const alias = this.db.aliases.find((a) => a.alias === slug);
+    if (!alias) return null;
+    return this.db.organizations.find((o) => o.id === alias.organizationId) ?? null;
   }
 
   async getOrganizationById(id: string): Promise<Organization | null> {
@@ -899,6 +907,35 @@ export class FixtureStore implements Store {
     suggestion.status = "rejected";
     suggestion.reviewReason = reason;
     this.audit(actorId, "suggestion.reject", "organization_suggestion", id, reason ?? undefined);
+    await this.persist();
+  }
+
+  // -------------------------------------------------------------------------
+  // Contact messages / correction requests
+  // -------------------------------------------------------------------------
+  async createContactMessage(
+    input: Omit<ContactMessage, "id" | "createdAt" | "status">,
+  ): Promise<ContactMessage> {
+    const message: ContactMessage = {
+      ...input,
+      id: newId("msg"),
+      status: "open",
+      createdAt: new Date().toISOString(),
+    };
+    this.db.messages.unshift(message);
+    await this.persist();
+    return message;
+  }
+
+  async listContactMessages(): Promise<ContactMessage[]> {
+    return [...this.db.messages];
+  }
+
+  async setContactMessageStatus(id: string, status: "open" | "resolved", actorId: string): Promise<void> {
+    const message = this.db.messages.find((m) => m.id === id);
+    if (!message) return;
+    message.status = status;
+    this.audit(actorId, `message.${status}`, "contact_message", id);
     await this.persist();
   }
 

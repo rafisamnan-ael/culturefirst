@@ -183,6 +183,11 @@ export interface Store {
   approveSuggestion(id: string, actorId: string): Promise<Organization>;
   rejectSuggestion(id: string, reason: string | null, actorId: string): Promise<void>;
 
+  // ---- Contact messages / correction requests ----
+  createContactMessage(input: Omit<import("@/types/domain").ContactMessage, "id" | "createdAt" | "status">): Promise<import("@/types/domain").ContactMessage>;
+  listContactMessages(): Promise<import("@/types/domain").ContactMessage[]>;
+  setContactMessageStatus(id: string, status: "open" | "resolved", actorId: string): Promise<void>;
+
   // ---- Audit ----
   listAuditLogs(limit?: number): Promise<AuditLog[]>;
 }

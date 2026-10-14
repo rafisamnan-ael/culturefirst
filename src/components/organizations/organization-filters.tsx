@@ -33,75 +33,90 @@ export function OrganizationFilters({
 
   return (
     <div className="space-y-4 rounded-lg border border-border bg-white p-4">
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          const value = new FormData(e.currentTarget).get("q");
-          update("q", String(value || ""));
-        }}
-        className="flex gap-2"
-      >
-        <div className="relative flex-1">
-          <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-          <input
-            name="q"
-            type="search"
-            defaultValue={params.get("q") ?? ""}
-            placeholder={t("common.searchPlaceholder")}
-            className="h-10 w-full rounded-md border border-border bg-white pl-9 pr-3 text-sm text-charcoal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
-          />
-        </div>
-        <Button type="submit">{t("common.search")}</Button>
-      </form>
+      <h2 className="text-sm font-semibold text-charcoal">{t("directory.filters")}</h2>
+      <div>
+        <label htmlFor="org-filter-search" className="mb-1.5 block text-xs font-medium text-muted-foreground">
+          {t("directory.searchLabel")}
+        </label>
+        <form
+          onSubmit={(e) => {
+            e.preventDefault();
+            const value = new FormData(e.currentTarget).get("q");
+            update("q", String(value || ""));
+          }}
+          className="flex gap-2"
+        >
+          <div className="relative flex-1">
+            <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+            <input
+              id="org-filter-search"
+              name="q"
+              type="search"
+              defaultValue={params.get("q") ?? ""}
+              placeholder={t("common.searchPlaceholder")}
+              className="h-10 w-full rounded-md border border-border bg-white pl-9 pr-3 text-sm text-charcoal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"
+            />
+          </div>
+          <Button type="submit">{t("common.search")}</Button>
+        </form>
+      </div>
 
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Select
-          aria-label={t("common.category")}
-          value={params.get("category") ?? ""}
-          onChange={(e) => update("category", e.target.value)}
-        >
-          <option value="">{t("common.allCategories")}</option>
-          {categories.map((c) => (
-            <option key={c.id} value={c.slug}>
-              {pick(c.name, locale)}
-            </option>
-          ))}
-        </Select>
+        <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+          {t("common.category")}
+          <Select
+            value={params.get("category") ?? ""}
+            onChange={(e) => update("category", e.target.value)}
+          >
+            <option value="">{t("common.allCategories")}</option>
+            {categories.map((c) => (
+              <option key={c.id} value={c.slug}>
+                {pick(c.name, locale)}
+              </option>
+            ))}
+          </Select>
+        </label>
 
-        <Select
-          aria-label={t("common.allDivisions")}
-          value={params.get("division") ?? ""}
-          onChange={(e) => update("division", e.target.value)}
-        >
-          <option value="">{t("common.allDivisions")}</option>
-          {divisions.map((d) => (
-            <option key={d} value={d}>
-              {d}
-            </option>
-          ))}
-        </Select>
+        <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+          {t("common.allDivisions")}
+          <Select
+            value={params.get("division") ?? ""}
+            onChange={(e) => update("division", e.target.value)}
+          >
+            <option value="">{t("common.allDivisions")}</option>
+            {divisions.map((d) => (
+              <option key={d} value={d}>
+                {d}
+              </option>
+            ))}
+          </Select>
+        </label>
 
-        <Select
-          aria-label={t("common.perspective")}
-          value={params.get("perspective") ?? ""}
-          onChange={(e) => update("perspective", e.target.value)}
-        >
-          <option value="">{t("common.allPerspectives")}</option>
-          {relationships.map((r) => (
-            <option key={r.id} value={r.slug}>
-              {pick(r.name, locale)}
-            </option>
-          ))}
-        </Select>
+        <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+          {t("common.perspective")}
+          <Select
+            value={params.get("perspective") ?? ""}
+            onChange={(e) => update("perspective", e.target.value)}
+          >
+            <option value="">{t("common.allPerspectives")}</option>
+            {relationships.map((r) => (
+              <option key={r.id} value={r.slug}>
+                {pick(r.name, locale)}
+              </option>
+            ))}
+          </Select>
+        </label>
 
-        <Select
-          aria-label={t("directory.ratingCoverage")}
-          value={params.get("scores") ?? ""}
-          onChange={(e) => update("scores", e.target.value)}
-        >
-          <option value="">{t("directory.all")}</option>
-          <option value="1">{t("directory.hasScores")}</option>
-        </Select>
+        <label className="flex flex-col gap-1.5 text-xs font-medium text-muted-foreground">
+          {t("directory.ratingCoverage")}
+          <Select
+            value={params.get("scores") ?? ""}
+            onChange={(e) => update("scores", e.target.value)}
+          >
+            <option value="">{t("directory.all")}</option>
+            <option value="1">{t("directory.hasScores")}</option>
+          </Select>
+        </label>
       </div>
 
       {hasFilters && (
@@ -112,7 +127,7 @@ export function OrganizationFilters({
           className="text-muted-foreground"
         >
           <X className="h-3.5 w-3.5" />
-          {t("common.cancel")}
+          {t("directory.clearFilters")}
         </Button>
       )}
     </div>

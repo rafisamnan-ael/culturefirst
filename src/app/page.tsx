@@ -22,9 +22,28 @@ export default async function HomePage() {
 
   const categories = await store.listCategories();
   const orgsPage = await store.listOrganizations({ pageSize: 6 });
-  const allOrgs = await store.listOrganizations({ pageSize: 1000 });
   const cards = await store.getScoreCards(orgsPage.items.map((o) => o.id));
+  const allOrgs = await store.listOrganizations({ pageSize: 1000 });
   const categoryById = new Map(categories.map((c) => [c.id, c]));
+
+  // "Recently reviewed" = organizations with at least one approved, eligible
+  // review, ordered by the most recent such review. Falls back to a neutral
+  // "Explore organizations" heading when nothing has been reviewed yet.
+  const recentReviews = await store.listReviews({ status: "published", pageSize: 100 });
+  const recentOrgIds: string[] = [];
+  for (const r of recentReviews.items) {
+    if (r.score === null) continue;
+    if (!recentOrgIds.includes(r.organizationId)) recentOrgIds.push(r.organizationId);
+    if (recentOrgIds.length >= 6) break;
+  }
+  const recentOrgsRaw = await store.listOrganizationsByIds(recentOrgIds);
+  const recentOrgs = recentOrgIds
+    .map((id) => recentOrgsRaw.find((o) => o.id === id))
+    .filter((o): o is NonNullable<typeof o> => Boolean(o));
+  const recentCards = await store.getScoreCards(recentOrgs.map((o) => o.id));
+  const hasRecent = recentOrgs.length > 0;
+  const featuredOrgs = hasRecent ? recentOrgs : orgsPage.items;
+  const featuredCards = hasRecent ? recentCards : cards;
 
   const orgCountByCategory = new Map<string, number>();
   for (const o of allOrgs.items) {
@@ -129,12 +148,12 @@ export default async function HomePage() {
               {locale === "bn" ? "প্রতিটি ক্যাটাগরির নিজস্ব মূল্যায়ন মানদণ্ড।" : "Each category has its own culture criteria."}
             </p>
           </div>
-          <Link href="/categories" className="hidden text-sm font-medium text-jade hover:underline sm:block">
-            {t("common.viewAll")}
+          <Link href="/categories" className="text-sm font-medium text-jade hover:underline">
+            {t("home.exploreAllCategories")}
           </Link>
         </div>
         <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {categories.slice(0, 6).map((c, idx) => (
+          {categories.map((c, idx) => (
             <div key={c.id} className="reveal" style={{ animationDelay: `${idx * 60}ms` }}>
               <CategoryCard category={c} count={orgCountByCategory.get(c.id) ?? 0} locale={locale} />
             </div>
@@ -146,21 +165,28 @@ export default async function HomePage() {
       <section className="relative border-y border-border bg-gradient-to-b from-white via-white to-soft/70 py-14">
         <div className="container">
           <div className="mb-6 flex items-end justify-between gap-4">
-            <h2 className="text-2xl font-semibold text-charcoal">{t("home.featured")}</h2>
+            <div>
+              <h2 className="text-2xl font-semibold text-charcoal">
+                {hasRecent ? t("home.featured") : t("home.exploreTitle")}
+              </h2>
+              {!hasRecent && (
+                <p className="mt-1 text-sm text-muted-foreground">{t("home.exploreSubtitle")}</p>
+              )}
+            </div>
             <Link href="/organizations" className="text-sm font-medium text-jade hover:underline">
               {t("nav.directory")}
             </Link>
           </div>
-          {orgsPage.items.length === 0 ? (
+          {featuredOrgs.length === 0 ? (
             <p className="text-sm text-muted-foreground">{t("directory.empty")}</p>
           ) : (
             <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {orgsPage.items.map((o) => (
+              {featuredOrgs.map((o) => (
                 <OrganizationCard
                   key={o.id}
                   organization={o}
                   category={categoryById.get(o.categoryId)}
-                  scoreCard={chooseCard(cards.filter((c) => c.organizationId === o.id))}
+                  scoreCard={chooseCard(featuredCards.filter((c) => c.organizationId === o.id))}
                   locale={locale}
                 />
               ))}

@@ -295,8 +295,8 @@ export const staticPages: Record<string, StaticPageContent> = {
         heading: { en: "General and corrections", bn: "সাধারণ ও সংশোধন" },
         body: [
           {
-            en: "For directory corrections, include the organization name and the specific information that needs attention. For organization claims, use the claim process on the organization profile.",
-            bn: "ডিরেক্টরি সংশোধনের জন্য প্রতিষ্ঠানের নাম ও সংশোধনযোগ্য তথ্য উল্লেখ করুন। প্রতিষ্ঠান দাবির জন্য প্রোফাইলে দাবি প্রক্রিয়া ব্যবহার করুন।",
+            en: "Use the form above for directory corrections — include the organization name and the specific information that needs attention. For organization claims, use the claim process on the organization profile.",
+            bn: "ডিরেক্টরি সংশোধনের জন্য উপরের ফর্মটি ব্যবহার করুন — প্রতিষ্ঠানের নাম ও সংশোধনযোগ্য তথ্য উল্লেখ করুন। প্রতিষ্ঠান দাবির জন্য প্রোফাইলে দাবি প্রক্রিয়া ব্যবহার করুন।",
           },
         ],
       },
@@ -304,8 +304,8 @@ export const staticPages: Record<string, StaticPageContent> = {
         heading: { en: "Safety and legal", bn: "নিরাপত্তা ও আইনগত" },
         body: [
           {
-            en: "Report credible safety concerns or legal notices through the contact channel published on this page after launch. A monitored production inbox must be configured before public launch.",
-            bn: "বিশ্বাসযোগ্য নিরাপত্তা উদ্বেগ বা আইনি নোটিশ লঞ্চের পর এই পেজে প্রকাশিত চ্যানেলে জানান। প্রকাশের আগে একটি মনিটর করা প্রোডাকশন ইনবক্স কনফিগার করতে হবে।",
+            en: "Report credible safety concerns or legal notices using the form above and choose the relevant topic. Messages are reviewed by the team; a monitored production inbox must be configured before public launch.",
+            bn: "বিশ্বাসযোগ্য নিরাপত্তা উদ্বেগ বা আইনি নোটিশ উপরের ফর্মটি দিয়ে জানান এবং সংশ্লিষ্ট বিষয় নির্বাচন করুন। বার্তা টিম পর্যালোচনা করে; প্রকাশের আগে একটি মনিটর করা প্রোডাকশন ইনবক্স কনফিগার করতে হবে।",
           },
         ],
         legal: true,

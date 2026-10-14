@@ -1,3 +1,4 @@
+import { Star } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { Badge } from "@/components/ui/badge";
 import type { Locale } from "@/lib/i18n/dictionary";
@@ -11,6 +12,34 @@ export function scoreColor(score: number | null): string {
   if (score >= 3) return "text-navy";
   if (score >= 2) return "text-gold";
   return "text-destructive";
+}
+
+export function ScoreStars({
+  score,
+  size = "md",
+}: {
+  score: number;
+  size?: "sm" | "md" | "lg";
+}) {
+  const iconSizes = {
+    sm: "h-3.5 w-3.5",
+    md: "h-4 w-4",
+    lg: "h-5 w-5",
+  }[size];
+
+  return (
+    <div className="flex items-center gap-0.5" aria-hidden="true">
+      {[1, 2, 3, 4, 5].map((star) => {
+        const fill =
+          score >= star
+            ? "fill-gold text-gold"
+            : score >= star - 0.5
+            ? "fill-gold/50 text-gold"
+            : "fill-transparent text-border";
+        return <Star key={star} className={cn(iconSizes, fill)} />;
+      })}
+    </div>
+  );
 }
 
 export function ScoreDisplay({
@@ -35,6 +64,15 @@ export function ScoreDisplay({
     lg: "text-5xl",
   } as const;
 
+  if (eligibleCount === 0) {
+    return (
+      <div className="flex flex-col gap-1">
+        <span className={cn("font-semibold text-muted-foreground", sizes[size])}>—</span>
+        <span className="text-xs font-medium text-muted-foreground">{t("org.noReviewsYet")}</span>
+      </div>
+    );
+  }
+
   if (sufficiency === "insufficient" || score === null) {
     return (
       <div className="flex flex-col gap-1">
@@ -48,12 +86,13 @@ export function ScoreDisplay({
   }
 
   return (
-    <div className="flex flex-col gap-1">
-      <div className="flex items-baseline gap-1.5">
-        <span className={cn("font-semibold tabular-nums", scoreColor(score), sizes[size])}>
+    <div className="flex flex-col gap-1.5">
+      <div className="flex items-baseline gap-2">
+        <span className={cn("font-bold tabular-nums tracking-tight", scoreColor(score), sizes[size])}>
           {score.toFixed(2)}
         </span>
-        <span className="text-sm text-muted-foreground">/ 5</span>
+        <span className="text-sm font-medium text-muted-foreground">/ 5</span>
+        <ScoreStars score={score} size={size} />
       </div>
       <div className="flex flex-wrap items-center gap-2">
         {sufficiency === "provisional" && (

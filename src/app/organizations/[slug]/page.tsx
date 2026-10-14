@@ -1,8 +1,9 @@
-import { notFound } from "next/navigation";
+import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
-import { MapPin, Globe, Star } from "lucide-react";
+import { Button } from "@/components/ui/button";
+import { MapPin, Globe, Star, ExternalLink, PenLine } from "lucide-react";
 import { OrganizationProfileView, type ProfilePerspective, type ProfileParameter } from "@/components/organizations/organization-profile-view";
 import { OrgLogo } from "@/components/organizations/org-logo";
 import { getStore } from "@/lib/data";
@@ -43,6 +44,7 @@ export default async function OrganizationProfilePage({
 
   const org = await store.getOrganizationBySlug(slug);
   if (!org || org.status === "merged") notFound();
+  if (org.slug !== slug) permanentRedirect(`/organizations/${org.slug}`);
 
   const category = await store.getCategoryById(org.categoryId);
   const relationships = await store.listRelationshipsForCategory(org.categoryId);
@@ -84,6 +86,7 @@ export default async function OrganizationProfilePage({
       score: aggregate?.averageScore ?? null,
       eligibleCount: aggregate?.eligibleCount ?? 0,
       sufficiency: suff,
+      questionnaireAvailable: Boolean(bundle),
       distribution: aggregate?.distribution ?? { "1": 0, "2": 0, "3": 0, "4": 0, "5": 0 },
       parameters,
       strengths,
@@ -96,17 +99,20 @@ export default async function OrganizationProfilePage({
   // Default perspective = the one with the most eligible reviews.
   perspectives.sort((a, b) => b.eligibleCount - a.eligibleCount);
 
+  const alternateNames = [org.bengaliName, ...org.alternateNames].filter((n): n is string => Boolean(n));
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "Organization",
     name: org.officialName,
-    ...(org.bengaliName ? { alternateName: org.bengaliName } : {}),
+    ...(alternateNames.length ? { alternateName: alternateNames } : {}),
     ...(org.website ? { url: org.website } : {}),
     ...(org.city ? { address: { "@type": "PostalAddress", addressLocality: org.city, addressRegion: org.district, addressCountry: "BD" } } : {}),
   };
 
+  const hasAnyAvailableBundle = perspectives.some((p) => p.questionnaireAvailable);
+
   return (
-    <div className="container py-10">
+    <div className="container py-8 sm:py-10">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
       <nav className="mb-4 text-sm text-muted-foreground">
         <Link href="/organizations" className="hover:text-jade">
@@ -122,11 +128,11 @@ export default async function OrganizationProfilePage({
         )}
       </nav>
 
-      <header className="flex flex-col gap-4 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
+      <header className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
         <div className="flex items-start gap-4">
           <OrgLogo slug={org.slug} name={org.officialName} />
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-charcoal sm:text-3xl">
+            <h1 className="text-2xl font-bold tracking-tight text-charcoal sm:text-3xl">
               {org.officialName}
             </h1>
             {org.bengaliName && (
@@ -134,7 +140,7 @@ export default async function OrganizationProfilePage({
                 {org.bengaliName}
               </p>
             )}
-            <div className="mt-2 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
               {category && <Badge variant="jade">{pick(category.name, locale)}</Badge>}
               {org.city && (
                 <span className="inline-flex items-center gap-1">
@@ -147,26 +153,46 @@ export default async function OrganizationProfilePage({
             </div>
           </div>
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          {org.website && (
+
+        <div className="flex shrink-0 flex-wrap items-center gap-2.5 sm:self-start">
+          {/* Prominent Write Review CTA */}
+          {hasAnyAvailableBundle ? (
+            <Button asChild variant="accent" size="default" className="font-semibold shadow-sm">
+              <Link href={`/organizations/${org.slug}/review`}>
+                <PenLine className="h-4 w-4" />
+                {t("nav.writeReview")}
+              </Link>
+            </Button>
+          ) : (
+            <Button disabled variant="outline" size="default" className="text-muted-foreground">
+              {t("review.reviewsComingSoon")}
+            </Button>
+          )}
+
+          {org.website ? (
             <a
               href={org.website}
               target="_blank"
-              rel="noopener noreferrer nofollow"
-              className="inline-flex items-center gap-1 text-sm text-jade hover:underline"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-2 text-xs sm:text-sm font-medium text-jade hover:bg-warmgray"
             >
               <Globe className="h-4 w-4" />
-              {locale === "bn" ? "ওয়েবসাইট" : "Website"}
+              {t("org.officialWebsite")}
+              <ExternalLink className="h-3.5 w-3.5" />
             </a>
-          )}
+          ) : null}
+
           <a
-            href={org.googleMapsUrl ?? `https://www.google.com/search?q=${encodeURIComponent(`${org.officialName} ${org.city ?? "Bangladesh"} Google reviews`)}`}
+            href={
+              org.googleMapsUrl ??
+              `https://www.google.com/search?q=${encodeURIComponent(`${org.officialName} ${org.city ?? "Bangladesh"}`)}`
+            }
             target="_blank"
-            rel="noopener noreferrer nofollow"
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-1.5 text-sm font-medium text-charcoal shadow-card transition hover:bg-warmgray"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-2 text-xs sm:text-sm font-medium text-charcoal shadow-card transition hover:bg-warmgray"
           >
             <Star className="h-4 w-4 text-gold" />
-            {locale === "bn" ? "গুগল রিভিউ ও রেটিং" : "View Google reviews & ratings"}
+            {org.googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
           </a>
         </div>
       </header>
