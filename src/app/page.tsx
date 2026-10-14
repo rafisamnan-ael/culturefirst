@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { CategoryCard } from "@/components/organizations/category-card";
 import { OrganizationCard } from "@/components/organizations/organization-card";
+import { ReviewSearch } from "@/components/review/review-search";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 import { brand } from "@/lib/config";
@@ -77,24 +78,21 @@ export default async function HomePage() {
               {t("home.heroSubtitle")}
             </p>
 
-            <form action="/organizations" method="get" className="mt-8 flex max-w-xl gap-2">
-              <label htmlFor="home-search" className="sr-only">
-                {t("common.search")}
-              </label>
-              <div className="relative flex-1">
-                <Search className="pointer-events-none absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-                <input
-                  id="home-search"
-                  name="q"
-                  type="search"
-                  placeholder={t("common.searchPlaceholder")}
-                  className="h-12 w-full rounded-md border border-transparent bg-white pl-9 pr-3 text-sm text-charcoal placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-jade-highlight"
-                />
-              </div>
-              <Button type="submit" variant="accent" size="lg">
-                {t("common.search")}
-              </Button>
-            </form>
+            <div className="mt-8 space-y-3">
+              <ReviewSearch
+                organizations={allOrgs.items.map((o) => ({
+                  id: o.id,
+                  slug: o.slug,
+                  officialName: o.officialName,
+                  bengaliName: o.bengaliName,
+                }))}
+              />
+              <p className="text-xs text-soft/60">
+                {locale === "bn"
+                  ? "সরাসরি যেকোনো প্রতিষ্ঠানের কালচার রিভিউ শুরু করতে নাম খুঁজুন।"
+                  : "Search any organization to jump directly into the culture review flow."}
+              </p>
+            </div>
 
             <div className="mt-6 flex flex-wrap gap-3">
               <Button asChild variant="accent" size="lg">
