@@ -74,7 +74,7 @@ export function ReviewSearch({
       </div>
 
       {isOpen && (
-        <div className="absolute left-0 right-0 top-full z-50 mt-2 overflow-hidden rounded-2xl border border-border bg-white p-2 shadow-elevated animate-in fade-in slide-in-from-top-2 duration-200">
+        <div className="absolute left-0 right-0 top-full z-[100] mt-2 overflow-hidden rounded-2xl border border-border bg-white p-2 shadow-elevated animate-in fade-in slide-in-from-top-2 duration-200">
           {!query.trim() && (
             <div className="px-3 py-2 text-xs font-bold uppercase tracking-wider text-muted-foreground flex items-center gap-1.5 border-b border-border/50 mb-1">
               <Flame className="h-3.5 w-3.5 text-gold" />

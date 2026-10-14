@@ -34,18 +34,20 @@ export default async function GlobalReviewPage() {
           </p>
         </div>
 
-        <div className="mx-auto flex justify-center scale-110 md:scale-125 mb-16">
-          <ReviewSearch
-            organizations={allOrgs.items.map((o) => ({
-              id: o.id,
-              slug: o.slug,
-              officialName: o.officialName,
-              bengaliName: o.bengaliName,
-            }))}
-          />
+        <div className="relative mx-auto flex justify-center z-50 mb-20 md:mb-24">
+          <div className="w-full scale-110 md:scale-125">
+            <ReviewSearch
+              organizations={allOrgs.items.map((o) => ({
+                id: o.id,
+                slug: o.slug,
+                officialName: o.officialName,
+                bengaliName: o.bengaliName,
+              }))}
+            />
+          </div>
         </div>
 
-        <div className="grid gap-6 sm:grid-cols-3 text-left">
+        <div className="grid gap-6 sm:grid-cols-3 text-left relative z-0">
           <div className="rounded-2xl border border-border/60 bg-white/50 p-6 backdrop-blur-sm">
             <ShieldCheck className="mb-3 h-8 w-8 text-jade" />
             <h3 className="font-bold text-charcoal">{locale === "bn" ? "নিরাপদ ও গোপনীয়" : "Safe & Private"}</h3>
