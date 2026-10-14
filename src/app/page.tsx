@@ -57,32 +57,32 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero: Review-Centric Redesign */}
-      <section className="relative overflow-hidden border-b border-border bg-[#0d1b2a] text-soft">
+      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft">
         <div aria-hidden className="pointer-events-none absolute inset-0">
           <div className="absolute -right-24 -top-24 h-[450px] w-[450px] rounded-full bg-jade/10 blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy/20 blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.03] grayscale" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }} />
+          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy-accent/20 blur-[100px]" />
+          <div className="absolute inset-0 opacity-[0.02] grayscale" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }} />
         </div>
         
         <div className="container relative z-10 grid gap-12 py-16 md:py-28 lg:grid-cols-2 lg:items-center">
           <div className="max-w-2xl text-center lg:text-left">
             <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-jade/30 bg-jade/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-jade-highlight">
               <Sparkles className="h-3.5 w-3.5" />
-              {locale === "bn" ? "বাংলাদেশের প্রথম কালচার প্ল্যাটফর্ম" : "Bangladesh's Independent Culture Platform"}
+              {locale === "bn" ? "বাংলাদেশের প্রথম কালচার প্ল্যাটফর্ম" : "Independent Culture Platform"}
             </div>
-            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl">
+            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl text-white">
               {locale === "bn" ? "প্রতিষ্ঠানের আসল চেহারা জানুন।" : "Know the culture before you choose."}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft/70 sm:text-xl mx-auto lg:mx-0">
+            <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft/80 sm:text-xl mx-auto lg:mx-0">
               {t("home.heroSubtitle")}
             </p>
             
-            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-4">
-               <div className="flex items-center gap-2 text-sm font-medium text-jade-highlight">
+            <div className="mt-8 flex flex-wrap justify-center lg:justify-start gap-6">
+               <div className="flex items-center gap-2 text-sm font-semibold text-jade-highlight bg-jade/5 px-3 py-1.5 rounded-lg border border-jade/10">
                  <CheckCircle2 className="h-4 w-4" />
                  <span>{locale === "bn" ? "সম্পূর্ণ গোপনীয়" : "100% Anonymous"}</span>
                </div>
-               <div className="flex items-center gap-2 text-sm font-medium text-jade-highlight">
+               <div className="flex items-center gap-2 text-sm font-semibold text-jade-highlight bg-jade/5 px-3 py-1.5 rounded-lg border border-jade/10">
                  <CheckCircle2 className="h-4 w-4" />
                  <span>{locale === "bn" ? "সঠিক যাচাইকরণ" : "Verified Methodology"}</span>
                </div>
@@ -91,16 +91,17 @@ export default async function HomePage() {
 
           {/* Interactive Review Centerpiece */}
           <div className="relative mx-auto w-full max-w-md lg:mr-0 animate-in fade-in slide-in-from-right-4 duration-700">
-            <Card className="overflow-hidden border-border/10 bg-white/10 backdrop-blur-xl shadow-2xl">
+            <div className="absolute -inset-1 rounded-[2.5rem] bg-gradient-to-tr from-jade/20 via-white/5 to-navy-accent/20 blur-2xl opacity-50" />
+            <Card className="glass relative overflow-hidden rounded-[2rem] border-white/20 shadow-2xl">
               <CardContent className="p-8">
                 <div className="mb-6 space-y-2 text-center">
-                   <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-2xl bg-jade shadow-lg shadow-jade/20 mb-4">
-                     <PenLine className="h-6 w-6 text-white" />
+                   <div className="mx-auto flex h-14 w-14 items-center justify-center rounded-2xl bg-gradient-jade shadow-lg shadow-jade/20 mb-4">
+                     <PenLine className="h-7 w-7 text-white" />
                    </div>
-                   <h2 className="text-2xl font-bold text-white">
+                   <h2 className="text-2xl font-bold text-charcoal">
                      {locale === "bn" ? "রিভিউ দিয়ে শুরু করুন" : "Start your review"}
                    </h2>
-                   <p className="text-sm text-soft/60">
+                   <p className="text-sm text-muted-foreground/80">
                      {locale === "bn" ? "প্রতিষ্ঠান নির্বাচন করে রেটিং দেওয়া শুরু করুন" : "Select an organization to rate your experience"}
                    </p>
                 </div>
@@ -116,15 +117,15 @@ export default async function HomePage() {
                 />
 
                 <div className="mt-8 grid grid-cols-2 gap-3 text-center">
-                   <Link href="/organizations" className="rounded-xl border border-soft/10 bg-white/5 p-3 text-xs font-bold text-soft transition hover:bg-white/10">
+                   <Link href="/organizations" className="rounded-xl border border-border bg-white/50 p-3 text-xs font-bold text-charcoal transition hover:bg-white/80">
                      {t("nav.directory")}
                    </Link>
-                   <Link href="/how-it-works" className="rounded-xl border border-soft/10 bg-white/5 p-3 text-xs font-bold text-soft transition hover:bg-white/10">
+                   <Link href="/how-it-works" className="rounded-xl border border-border bg-white/50 p-3 text-xs font-bold text-charcoal transition hover:bg-white/80">
                      {t("nav.howItWorks")}
                    </Link>
                 </div>
 
-                <div className="mt-6 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-soft/40">
+                <div className="mt-6 flex items-center justify-center gap-2 text-[10px] uppercase tracking-widest font-bold text-muted-foreground/60">
                    <Lock className="h-3 w-3" />
                    <span>{locale === "bn" ? "নিরাপদ ও এনক্রিপ্টেড" : "Secure & Encrypted Submission"}</span>
                 </div>

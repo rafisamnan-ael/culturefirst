@@ -15,11 +15,11 @@ const config: Config = {
     },
     extend: {
       colors: {
-        navy: { DEFAULT: "#10283F", secondary: "#203D52" },
-        soft: "#F8F9F7",
-        warmgray: "#EEF1F0",
-        jade: { DEFAULT: "#4D8E83", highlight: "#B8E4D5" },
-        gold: "#C5A46A",
+        navy: { DEFAULT: "#0A1929", secondary: "#142F4A", accent: "#1A4570" },
+        soft: "#FDFDFD",
+        warmgray: "#F4F6F5",
+        jade: { DEFAULT: "#2D7D6D", highlight: "#E1F2EE", deep: "#1B4A40" },
+        gold: { DEFAULT: "#D4AF37", light: "#E6C96B" },
         charcoal: "#1C2832",
         border: "#DCE2E0",
         background: "#F8F9F7",
