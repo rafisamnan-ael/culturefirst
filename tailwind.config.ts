@@ -44,8 +44,10 @@ const config: Config = {
         elevated: "0 8px 30px rgba(16,40,63,0.10)",
         soft: "0 6px 22px rgba(16,40,63,0.08)",
         lux: "0 10px 40px -12px rgba(16,40,63,0.28), 0 2px 10px rgba(16,40,63,0.06)",
+        "lux-strong": "0 28px 70px -28px rgba(10,25,41,0.5), 0 12px 30px -14px rgba(45,125,109,0.4)",
         glow: "0 0 0 1px rgba(77,142,131,0.25), 0 12px 40px -10px rgba(45,125,109,0.45)",
         gold: "0 10px 40px -12px rgba(212,175,55,0.50)",
+        "gold-glow": "0 0 0 1px rgba(212,175,55,0.35), 0 16px 50px -16px rgba(212,175,55,0.55)",
       },
       keyframes: {
         "fade-in": { from: { opacity: "0", transform: "translateY(4px)" }, to: { opacity: "1", transform: "translateY(0)" } },
@@ -79,6 +81,27 @@ const config: Config = {
           "50%": { opacity: "0.9" },
         },
         "spin-slow": { to: { transform: "rotate(360deg)" } },
+        aurora: {
+          "0%,100%": { backgroundPosition: "0% 50%" },
+          "50%": { backgroundPosition: "100% 50%" },
+        },
+        "gradient-pan": {
+          "0%": { backgroundPosition: "0% 50%" },
+          "100%": { backgroundPosition: "200% 50%" },
+        },
+        bob: {
+          "0%,100%": { transform: "translateY(0)" },
+          "50%": { transform: "translateY(-12px)" },
+        },
+        sheen: {
+          "0%": { transform: "translateX(-140%) skewX(-14deg)" },
+          "100%": { transform: "translateX(260%) skewX(-14deg)" },
+        },
+        "orb-drift": {
+          "0%,100%": { transform: "translate3d(0,0,0) scale(1)" },
+          "33%": { transform: "translate3d(40px,-30px,0) scale(1.1)" },
+          "66%": { transform: "translate3d(-30px,24px,0) scale(0.95)" },
+        },
       },
       animation: {
         "fade-in": "fade-in 0.35s ease-out",
@@ -92,6 +115,12 @@ const config: Config = {
         shine: "shine 2.2s ease-in-out infinite",
         "pulse-glow": "pulse-glow 5s ease-in-out infinite",
         "spin-slow": "spin-slow 22s linear infinite",
+        aurora: "aurora 22s ease-in-out infinite",
+        "gradient-pan": "gradient-pan 10s linear infinite",
+        bob: "bob 7s ease-in-out infinite",
+        "bob-slow": "bob 12s ease-in-out infinite",
+        sheen: "sheen 4s ease-in-out infinite",
+        "orb-drift": "orb-drift 24s ease-in-out infinite",
       },
       backgroundImage: {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
@@ -99,6 +128,9 @@ const config: Config = {
         "gradient-jade": "linear-gradient(135deg, #2D7D6D 0%, #1B4A40 100%)",
         "gradient-premium": "linear-gradient(120deg, #0A1929 0%, #1B4A40 45%, #2D7D6D 75%, #D4AF37 130%)",
         "gradient-royal": "linear-gradient(135deg, #10283F 0%, #1A4570 50%, #2D7D6D 100%)",
+        "gradient-aurora": "linear-gradient(120deg, #0A1929 0%, #1B4A40 28%, #2D7D6D 52%, #1A4570 76%, #0A1929 100%)",
+        "gradient-card": "linear-gradient(135deg, rgba(45,125,109,0.16) 0%, rgba(26,69,112,0.10) 50%, rgba(212,175,55,0.14) 100%)",
+        "gradient-jade-soft": "linear-gradient(135deg, rgba(45,125,109,0.12), rgba(225,242,238,0.45))",
       },
     },
   },

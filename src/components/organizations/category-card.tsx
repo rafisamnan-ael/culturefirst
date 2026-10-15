@@ -28,10 +28,10 @@ export function CategoryCard({
 }) {
   const Icon = icons[category.icon] ?? Building2;
   return (
-    <Link href={`/categories/${category.slug}`} className="block">
-      <Card className="h-full transition-shadow hover:shadow-elevated">
+    <Link href={`/categories/${category.slug}`} className="group block">
+      <Card className="card-glam hover-lift h-full border-border/50 bg-gradient-card">
         <CardContent className="flex h-full flex-col gap-3 p-5">
-          <div className="flex h-11 w-11 items-center justify-center rounded-md bg-jade-highlight text-navy">
+          <div className="flex h-11 w-11 items-center justify-center rounded-md bg-gradient-jade text-white shadow-glow transition-transform duration-300 group-hover:scale-110">
             <Icon className="h-5 w-5" />
           </div>
           <div>
@@ -41,7 +41,7 @@ export function CategoryCard({
             </p>
           </div>
           {count !== undefined && (
-            <p className="mt-auto text-xs font-medium text-jade">
+            <p className="mt-auto inline-flex w-fit items-center rounded-full bg-navy/5 px-2.5 py-1 text-xs font-semibold text-jade">
               {count} {locale === "bn" ? "প্রতিষ্ঠান" : "organizations"}
             </p>
           )}

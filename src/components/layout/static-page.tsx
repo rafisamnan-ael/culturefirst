@@ -30,7 +30,7 @@ export async function StaticPage({
       <div className="container max-w-3xl py-12">
         {showThresholds && (
           <div className="mb-10 grid gap-6 sm:grid-cols-2">
-            <div className="rounded-2xl border border-border/40 bg-white shadow-soft p-6">
+            <div className="card-glam rounded-2xl border border-border/40 bg-gradient-card p-6 shadow-soft">
               <h2 className="text-sm font-bold uppercase tracking-wider text-charcoal">
                 {locale === "bn" ? "রেটিং স্কেল" : "Rating scale"}
               </h2>
@@ -43,7 +43,7 @@ export async function StaticPage({
                 ))}
               </ul>
             </div>
-            <div className="rounded-2xl border border-border/40 bg-white shadow-soft p-6">
+            <div className="card-glam rounded-2xl border border-border/40 bg-gradient-card p-6 shadow-soft">
               <h2 className="text-sm font-bold uppercase tracking-wider text-charcoal">
                 {locale === "bn" ? "প্রকাশের নিয়ম" : "Publication rules"}
               </h2>
@@ -62,6 +62,7 @@ export async function StaticPage({
           {page.sections.map((section) => (
             <section key={section.heading.en}>
               <h2 className="text-2xl font-bold text-charcoal">{section.heading[locale]}</h2>
+              <div className="gradient-rule mt-3 w-16" />
               {section.body.map((p, i) => (
                 <p key={i} className="mt-4 text-base leading-relaxed text-muted-foreground">
                   {p[locale]}
@@ -79,7 +80,7 @@ export async function StaticPage({
           ))}
         </div>
 
-        <div className="mt-16 rounded-2xl border border-border/40 bg-warmgray/50 p-8">
+        <div className="mt-16 card-glam rounded-2xl border border-border/40 bg-gradient-card p-8">
           <p className="text-sm text-charcoal font-semibold">
             {locale === "bn" ? "প্রশ্ন আছে?" : "Have a question?"}{" "}
             <Link href="/contact" className="text-jade hover:underline font-bold">

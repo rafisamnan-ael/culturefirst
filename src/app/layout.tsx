@@ -6,6 +6,7 @@ import { ToastProvider } from "@/components/ui/toast";
 import { SiteHeader } from "@/components/layout/site-header";
 import { SiteFooter } from "@/components/layout/site-footer";
 import { DevBanner } from "@/components/layout/dev-banner";
+import { ScrollReveal } from "@/components/layout/scroll-reveal";
 import { getCurrentUser, listDevUsers } from "@/lib/auth";
 import { brand, siteUrl } from "@/lib/config";
 
@@ -48,11 +49,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               user={user ? { id: user.id, displayName: user.displayName, role: user.role } : null}
               devUsers={devUsers}
             />
-            <main className="relative flex-1 overflow-hidden bg-aurora">
+            <main className="relative flex-1 overflow-hidden bg-aurora bg-aurora-drift">
               <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-                <div className="absolute -right-24 top-24 h-[520px] w-[520px] rounded-full bg-jade/10 blur-[130px] animate-blob" />
-                <div className="absolute -left-24 bottom-24 h-[520px] w-[520px] rounded-full bg-navy-accent/10 blur-[130px] animate-blob delay-3000" />
+                <div className="orb left-[-6rem] top-20 h-[520px] w-[520px] bg-jade/25 animate-orb-drift" />
+                <div className="orb right-[-6rem] top-1/3 h-[540px] w-[540px] bg-navy-accent/30 animate-orb-drift delay-2000" />
+                <div className="orb bottom-10 left-1/3 h-[440px] w-[440px] bg-gold/20 animate-orb-drift delay-4000" />
+                <div className="orb bottom-[-6rem] left-[-4rem] h-[480px] w-[480px] bg-jade-deep/20 animate-orb-drift delay-3000" />
               </div>
+              <ScrollReveal />
               {children}
             </main>
             <SiteFooter />

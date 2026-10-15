@@ -20,10 +20,10 @@ export function OrganizationCard({
   locale: Locale;
 }) {
   return (
-    <Card className="group h-full border-border/60 transition duration-300 hover:-translate-y-0.5 hover:border-jade/20 hover:shadow-soft">
+    <Card className="group card-lux card-glam hover-lift h-full border-border/60 bg-white">
       <CardContent className="flex h-full flex-col gap-4 p-5">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-to-br from-navy to-navy-secondary text-soft shadow-card transition group-hover:shadow-soft">
+          <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-gradient-royal text-soft shadow-card transition group-hover:shadow-glow">
             <Building2 className="h-5 w-5" />
           </div>
           <div className="min-w-0 flex-1">

@@ -57,12 +57,14 @@ export default async function HomePage() {
   return (
     <div>
       {/* Hero: Review-Centric Redesign */}
-      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft">
+      <section data-no-animate className="relative overflow-hidden border-b border-border bg-aurora-dark text-soft">
         <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
-          <div className="absolute -right-24 -top-24 h-[450px] w-[450px] rounded-full bg-jade/20 blur-[110px] animate-blob" />
-          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy-accent/30 blur-[120px] animate-blob delay-2000" />
-          <div className="absolute left-1/3 top-1/2 h-[300px] w-[300px] rounded-full bg-gold/10 blur-[120px] animate-pulse-glow" />
+          <div className="orb -right-24 -top-24 h-[460px] w-[460px] bg-jade/40 animate-orb-drift" />
+          <div className="orb -bottom-24 -left-24 h-[420px] w-[420px] bg-navy-accent/50 animate-orb-drift delay-2000" />
+          <div className="orb left-1/3 top-1/2 h-[320px] w-[320px] bg-gold/25 animate-pulse-glow" />
+          <div className="absolute inset-0 bg-gradient-aurora bg-size-200 opacity-20 animate-gradient-x" />
           <div className="absolute inset-0 bg-grid-faint opacity-50" />
+          <div className="sheen-overlay" />
         </div>
         
         <div className="container relative z-10 grid gap-12 py-16 md:py-28 lg:grid-cols-2 lg:items-center">
@@ -150,8 +152,9 @@ export default async function HomePage() {
        {/* Categories */}
       <section className="container py-20">
         <div className="mb-10 text-center">
-            <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">{t("home.browseCategories")}</h2>
-            <p className="mt-3 text-lg text-muted-foreground">
+            <h2 className="text-3xl font-bold text-gradient-aurora sm:text-4xl">{t("home.browseCategories")}</h2>
+            <div className="gradient-rule mx-auto mt-4 w-24" />
+            <p className="mt-4 text-lg text-muted-foreground">
               {locale === "bn" ? "প্রতিটি ক্যাটাগরির জন্য রয়েছে বিশেষ মূল্যায়ন মানদণ্ড।" : "Specialized culture criteria for every industry."}
             </p>
         </div>
@@ -165,11 +168,11 @@ export default async function HomePage() {
       </section>
 
        {/* Featured */}
-      <section className="border-y border-border bg-warmgray/30 py-20">
+      <section className="section-tint border-y border-border py-20">
         <div className="container">
           <div className="mb-10 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div className="text-center sm:text-left">
-              <h2 className="text-3xl font-bold text-charcoal sm:text-4xl">
+              <h2 className="text-3xl font-bold text-gradient-aurora sm:text-4xl">
                 {hasRecent ? t("home.featured") : t("home.exploreTitle")}
               </h2>
               <p className="mt-2 text-muted-foreground">{hasRecent ? "" : t("home.exploreSubtitle")}</p>
@@ -202,14 +205,15 @@ export default async function HomePage() {
       <section className="container py-24">
         <div className="grid gap-12 lg:grid-cols-3 lg:items-center">
           <div className="lg:col-span-1 text-center lg:text-left">
-            <h2 className="text-3xl font-bold text-charcoal sm:text-4xl leading-tight">{t("home.perspectivesTitle")}</h2>
+            <h2 className="text-3xl font-bold text-gradient-aurora sm:text-4xl leading-tight">{t("home.perspectivesTitle")}</h2>
+            <div className="gradient-rule mx-auto mt-4 w-24 lg:mx-0" />
             <p className="mt-5 text-lg leading-relaxed text-muted-foreground">{t("home.perspectivesBody")}</p>
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
             {perspectives.map((p, idx) => (
-              <Card key={p.title} className="group card-lux hover-lift border-border/40 shadow-soft">
+              <Card key={p.title} className="group card-lux card-glam hover-lift border-border/40 shadow-soft">
                 <CardContent className="space-y-4 p-8">
-                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-jade/10 text-jade transition-colors group-hover:bg-jade group-hover:text-white">
+                  <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-gradient-jade text-white shadow-glow transition-transform duration-300 group-hover:scale-110">
                     <p.icon className="h-6 w-6" />
                   </div>
                   <h3 className="text-xl font-bold text-charcoal">{p.title}</h3>
@@ -222,8 +226,11 @@ export default async function HomePage() {
       </section>
 
       {/* Trust */}
-      <section className="bg-navy py-24 text-soft overflow-hidden relative">
-        <div className="absolute top-0 right-0 w-96 h-96 bg-jade/5 rounded-full blur-[100px] -mr-48 -mt-48" />
+      <section className="relative overflow-hidden bg-aurora-dark py-24 text-soft">
+        <div aria-hidden className="pointer-events-none absolute inset-0">
+          <div className="orb -right-24 -top-24 h-[420px] w-[420px] bg-jade/30 animate-orb-drift" />
+          <div className="orb -bottom-24 left-1/4 h-[380px] w-[380px] bg-gold/20 animate-orb-drift delay-2000" />
+        </div>
         <div className="container relative z-10 grid gap-12 lg:grid-cols-3">
           <div className="text-center lg:text-left">
             <div className="mx-auto lg:mx-0 flex h-14 w-14 items-center justify-center rounded-2xl bg-white/5 border border-white/10 mb-6">
@@ -260,9 +267,9 @@ export default async function HomePage() {
 
        {/* Final CTA: Focused on the Review Page */}
       <section className="container py-24">
-        <div className="relative overflow-hidden rounded-3xl border-2 border-jade/20 bg-gradient-to-br from-jade-highlight/40 via-white to-white p-10 shadow-elevated text-center sm:p-20">
-          <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 h-64 w-64 rounded-full bg-jade/10 blur-[80px]" />
-          <div aria-hidden className="pointer-events-none absolute -left-32 -bottom-32 h-64 w-64 rounded-full bg-navy/5 blur-[80px]" />
+        <div className="card-glam relative overflow-hidden rounded-3xl border-2 border-jade/20 bg-gradient-to-br from-jade-highlight/60 via-white to-gold/10 p-10 shadow-lux-strong text-center sm:p-20">
+          <div aria-hidden className="pointer-events-none absolute -right-32 -top-32 h-64 w-64 rounded-full bg-jade/20 blur-[80px] animate-orb-drift" />
+          <div aria-hidden className="pointer-events-none absolute -left-32 -bottom-32 h-64 w-64 rounded-full bg-gold/20 blur-[80px] animate-orb-drift delay-2000" />
           
           <div className="relative z-10 mx-auto max-w-2xl space-y-8">
             <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-white shadow-soft">
