@@ -48,9 +48,11 @@ export default async function RootLayout({ children }: { children: React.ReactNo
               user={user ? { id: user.id, displayName: user.displayName, role: user.role } : null}
               devUsers={devUsers}
             />
-            <main className="flex-1 bg-soft/50 relative overflow-hidden">
-              <div className="absolute top-0 right-0 -z-10 h-[500px] w-[500px] rounded-full bg-jade/5 blur-[120px]" />
-              <div className="absolute bottom-0 left-0 -z-10 h-[500px] w-[500px] rounded-full bg-navy/5 blur-[120px]" />
+            <main className="relative flex-1 overflow-hidden bg-aurora">
+              <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
+                <div className="absolute -right-24 top-24 h-[520px] w-[520px] rounded-full bg-jade/10 blur-[130px] animate-blob" />
+                <div className="absolute -left-24 bottom-24 h-[520px] w-[520px] rounded-full bg-navy-accent/10 blur-[130px] animate-blob delay-3000" />
+              </div>
               {children}
             </main>
             <SiteFooter />

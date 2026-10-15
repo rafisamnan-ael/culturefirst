@@ -58,22 +58,23 @@ export default async function HomePage() {
     <div>
       {/* Hero: Review-Centric Redesign */}
       <section className="relative overflow-hidden border-b border-border bg-mesh text-soft">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-[450px] w-[450px] rounded-full bg-jade/10 blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy-accent/20 blur-[100px]" />
-          <div className="absolute inset-0 opacity-[0.02] grayscale" style={{ backgroundImage: "url('https://www.transparenttextures.com/patterns/cubes.png')" }} />
+        <div aria-hidden className="pointer-events-none absolute inset-0 overflow-hidden">
+          <div className="absolute -right-24 -top-24 h-[450px] w-[450px] rounded-full bg-jade/20 blur-[110px] animate-blob" />
+          <div className="absolute -bottom-24 -left-24 h-[400px] w-[400px] rounded-full bg-navy-accent/30 blur-[120px] animate-blob delay-2000" />
+          <div className="absolute left-1/3 top-1/2 h-[300px] w-[300px] rounded-full bg-gold/10 blur-[120px] animate-pulse-glow" />
+          <div className="absolute inset-0 bg-grid-faint opacity-50" />
         </div>
         
         <div className="container relative z-10 grid gap-12 py-16 md:py-28 lg:grid-cols-2 lg:items-center">
           <div className="max-w-2xl text-center lg:text-left">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-jade/30 bg-jade/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-jade-highlight">
-              <Sparkles className="h-3.5 w-3.5" />
+            <div className="mb-6 inline-flex animate-fade-up items-center gap-2 rounded-full border border-jade/30 bg-jade/10 px-4 py-1.5 text-xs font-bold uppercase tracking-widest text-jade-highlight backdrop-blur-sm">
+              <Sparkles className="h-3.5 w-3.5 text-gold-light" />
               {locale === "bn" ? "বাংলাদেশের প্রথম কালচার প্ল্যাটফর্ম" : "Independent Culture Platform"}
             </div>
-            <h1 className="text-balance text-4xl font-bold leading-[1.1] tracking-tight sm:text-6xl lg:text-7xl text-white">
+            <h1 className="text-balance animate-fade-up delay-100 text-4xl font-bold leading-[1.1] tracking-tight text-gradient-lux sm:text-6xl lg:text-7xl">
               {locale === "bn" ? "প্রতিষ্ঠানের আসল চেহারা জানুন।" : "Know the culture before you choose."}
             </h1>
-            <p className="mt-6 max-w-xl text-lg leading-relaxed text-soft/80 sm:text-xl mx-auto lg:mx-0">
+            <p className="mt-6 max-w-xl animate-fade-up delay-200 text-lg leading-relaxed text-soft/80 sm:text-xl mx-auto lg:mx-0">
               {t("home.heroSubtitle")}
             </p>
             
@@ -133,9 +134,9 @@ export default async function HomePage() {
             </Card>
             
             {/* Floating stats decorative */}
-            <div className="absolute -bottom-6 -left-6 hidden sm:flex items-center gap-3 rounded-2xl border border-border/10 bg-navy-secondary p-4 shadow-xl">
+            <div className="absolute -bottom-6 -left-6 hidden animate-float sm:flex items-center gap-3 rounded-2xl border border-white/10 bg-navy-secondary/90 p-4 shadow-2xl backdrop-blur">
                <div className="flex -space-x-2">
-                 {[1,2,3].map(i => <div key={i} className="h-8 w-8 rounded-full border-2 border-navy-secondary bg-jade-highlight" />)}
+                 {[1,2,3].map(i => <div key={i} className="h-8 w-8 rounded-full border-2 border-navy-secondary bg-gradient-jade" />)}
                </div>
                <div className="text-left">
                  <p className="text-[10px] font-bold uppercase tracking-tighter text-soft/50 leading-none">Joined by</p>
@@ -206,7 +207,7 @@ export default async function HomePage() {
           </div>
           <div className="grid gap-6 sm:grid-cols-2 lg:col-span-2">
             {perspectives.map((p, idx) => (
-              <Card key={p.title} className="group border-border/40 shadow-soft transition-all hover:border-jade/20 hover:shadow-elevated">
+              <Card key={p.title} className="group card-lux hover-lift border-border/40 shadow-soft">
                 <CardContent className="space-y-4 p-8">
                   <div className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-jade/10 text-jade transition-colors group-hover:bg-jade group-hover:text-white">
                     <p.icon className="h-6 w-6" />

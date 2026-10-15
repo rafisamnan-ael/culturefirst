@@ -1,11 +1,12 @@
 import { Suspense } from "react";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Search, Sparkles } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { OrganizationCard } from "@/components/organizations/organization-card";
 import { OrganizationFilters } from "@/components/organizations/organization-filters";
 import { Skeleton } from "@/components/ui/skeleton";
+import { PageHero } from "@/components/layout/page-hero";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 import type { OrgScoreCard } from "@/lib/data/store";
@@ -71,26 +72,12 @@ export default async function DirectoryPage({
 
   return (
     <div className="pb-20">
-      {/* Colorful Header */}
-      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft py-16 md:py-20">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-[400px] w-[400px] rounded-full bg-jade/10 blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 h-[350px] w-[350px] rounded-full bg-navy-accent/20 blur-[100px]" />
-        </div>
-        
-        <div className="container relative z-10">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-bold uppercase tracking-widest text-jade-highlight">
-            <Search className="h-3.5 w-3.5" />
-            {t("directory.title")}
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            {t("directory.title")}
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-soft/80 sm:text-xl max-w-2xl">
-            {t("directory.subtitle")}
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow={t("directory.title")}
+        icon={Search}
+        title={t("directory.title")}
+        subtitle={t("directory.subtitle")}
+      />
 
       <div className="container py-12">
         <Suspense fallback={<Skeleton className="h-32 w-full" />}>

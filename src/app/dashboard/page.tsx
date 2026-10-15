@@ -3,6 +3,8 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import { PageHero } from "@/components/layout/page-hero";
+import { CheckCircle2, Clock, FileText, UserCircle2 } from "lucide-react";
 import { getStore } from "@/lib/data";
 import { getCurrentUser } from "@/lib/auth";
 import { getServerT } from "@/lib/i18n/server";
@@ -42,29 +44,37 @@ export default async function DashboardPage() {
     total: reviews.length,
   };
 
-  return (
-    <div className="container py-10">
-      <header className="mb-8">
-        <h1 className="text-2xl font-semibold tracking-tight text-charcoal">{t("dashboard.title")}</h1>
-        <p className="mt-1 text-sm text-muted-foreground">
-          {user.displayName || user.email} · <span className="capitalize">{user.role}</span>
-        </p>
-      </header>
+  const stats = [
+    { label: t("admin.totalReviews"), value: counts.total, icon: FileText },
+    { label: t("admin.pending"), value: counts.pending, icon: Clock },
+    { label: t("status.published"), value: counts.published, icon: CheckCircle2 },
+  ];
 
-      <div className="mb-8 grid gap-4 sm:grid-cols-3">
-        {[
-          { label: t("admin.totalReviews"), value: counts.total },
-          { label: t("admin.pending"), value: counts.pending },
-          { label: t("status.published"), value: counts.published },
-        ].map((s) => (
-          <Card key={s.label}>
-            <CardContent className="p-5">
-              <p className="text-2xl font-semibold text-charcoal">{s.value}</p>
-              <p className="text-sm text-muted-foreground">{s.label}</p>
-            </CardContent>
-          </Card>
-        ))}
-      </div>
+  return (
+    <div>
+      <PageHero
+        eyebrow={<span className="capitalize">{user.role}</span>}
+        icon={UserCircle2}
+        title={t("dashboard.title")}
+        subtitle={user.displayName || user.email}
+        size="compact"
+      />
+      <div className="container py-10">
+        <div className="mb-8 grid gap-4 sm:grid-cols-3">
+          {stats.map((s) => (
+            <Card key={s.label} className="hover-lift overflow-hidden border-border/60 shadow-soft">
+              <CardContent className="flex items-center gap-4 p-5">
+                <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-gradient-jade text-white shadow-soft">
+                  <s.icon className="h-5 w-5" />
+                </span>
+                <div>
+                  <p className="text-2xl font-bold tabular-nums text-charcoal">{s.value}</p>
+                  <p className="text-sm text-muted-foreground">{s.label}</p>
+                </div>
+              </CardContent>
+            </Card>
+          ))}
+        </div>
 
       <section className="mb-10">
         <h2 className="mb-4 text-lg font-semibold text-charcoal">{t("dashboard.myReviews")}</h2>
@@ -77,7 +87,7 @@ export default async function DashboardPage() {
             {reviews.map((r) => {
               const org = orgById.get(r.organizationId);
               return (
-                <Card key={r.id}>
+                <Card key={r.id} className="hover-lift border-border/60 shadow-soft">
                   <CardContent className="space-y-3 p-5">
                     <div className="flex flex-wrap items-center justify-between gap-2">
                       <div>
@@ -114,7 +124,7 @@ export default async function DashboardPage() {
 
       <section className="max-w-xl">
         <h2 className="mb-4 text-lg font-semibold text-charcoal">{t("dashboard.privacy")}</h2>
-        <Card>
+        <Card className="border-border/60 shadow-soft">
           <CardContent className="p-5">
             <PrivacySettings initialName={user.displayName} />
             <p className="mt-4 text-xs text-muted-foreground">
@@ -125,6 +135,7 @@ export default async function DashboardPage() {
           </CardContent>
         </Card>
       </section>
+      </div>
     </div>
   );
 }

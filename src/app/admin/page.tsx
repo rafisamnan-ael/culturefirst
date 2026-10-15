@@ -27,9 +27,9 @@ export default async function AdminDashboardPage() {
       <h1 className="mb-6 text-2xl font-semibold tracking-tight text-charcoal">{t("admin.dashboard")}</h1>
       <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
         {stats.map((s) => (
-          <Card key={s.label}>
+          <Card key={s.label} className="hover-lift border-border/60 shadow-soft">
             <CardContent className="p-5">
-              <p className="text-3xl font-semibold tabular-nums text-charcoal">{s.value}</p>
+              <p className="bg-gradient-to-br from-navy via-navy-accent to-jade bg-clip-text text-3xl font-bold tabular-nums text-transparent">{s.value}</p>
               <p className="text-sm text-muted-foreground">{s.label}</p>
             </CardContent>
           </Card>
@@ -38,7 +38,7 @@ export default async function AdminDashboardPage() {
 
       <section className="mt-8">
         <h2 className="mb-3 text-lg font-semibold text-charcoal">{t("admin.audit")}</h2>
-        <Card>
+        <Card className="border-border/60 shadow-soft">
           <CardContent className="divide-y divide-border p-0">
             {audits.length === 0 ? (
               <p className="p-5 text-sm text-muted-foreground">No activity yet.</p>

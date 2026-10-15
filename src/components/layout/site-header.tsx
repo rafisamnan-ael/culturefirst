@@ -43,21 +43,22 @@ export function SiteHeader({
   const isStaff = user?.role === "admin" || user?.role === "moderator";
 
   return (
-    <header className="sticky top-0 z-40 border-b border-border bg-soft/95 backdrop-blur">
+    <header className="sticky top-0 z-40 border-b border-border bg-soft/80 shadow-[0_1px_20px_-12px_rgba(16,40,63,0.35)] backdrop-blur-xl">
+      <div aria-hidden className="pointer-events-none absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-gold/50 to-transparent" />
       <div className="container flex h-16 items-center justify-between gap-4">
         <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-2">
-            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-navy text-sm font-bold text-soft">
+          <Link href="/" className="group flex items-center gap-2">
+            <span className="flex h-8 w-8 items-center justify-center rounded-md bg-gradient-navy text-sm font-bold text-soft shadow-soft ring-1 ring-gold/30 transition-transform duration-300 group-hover:scale-105">
               C
             </span>
-            <span className="text-lg font-semibold tracking-tight text-navy">{brandName}</span>
+            <span className="text-gradient-navy text-lg font-semibold tracking-tight">{brandName}</span>
           </Link>
           <nav className="hidden items-center gap-6 lg:flex" aria-label="Primary">
             {NAV.map((item) => (
               <Link
                 key={item.href}
                 href={item.href}
-                className="text-sm font-medium text-charcoal/80 transition-colors hover:text-jade"
+                className="relative text-sm font-medium text-charcoal/80 transition-colors after:absolute after:-bottom-1.5 after:left-0 after:h-0.5 after:w-0 after:rounded-full after:bg-gradient-jade after:transition-all after:duration-300 hover:text-jade hover:after:w-full"
               >
                 {t(item.key)}
               </Link>
@@ -66,7 +67,7 @@ export function SiteHeader({
         </div>
 
         <div className="flex items-center gap-3">
-          <Button asChild variant="accent" size="sm" className="font-semibold shadow-sm">
+          <Button asChild variant="accent" size="sm" className="shine-sweep font-semibold shadow-soft transition-shadow hover:shadow-glow">
             <Link href="/review" className="flex items-center gap-1.5">
               <PenLine className="h-4 w-4" />
               <span>{t("nav.writeReview")}</span>

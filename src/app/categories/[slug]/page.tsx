@@ -7,6 +7,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { OrganizationCard } from "@/components/organizations/organization-card";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { PageHero } from "@/components/layout/page-hero";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 import { pick } from "@/lib/i18n/pick";
@@ -58,36 +59,12 @@ export default async function CategoryPage({ params }: { params: Promise<{ slug:
 
   return (
     <div className="pb-20">
-      {/* Dynamic Colorful Header */}
-      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft py-16 md:py-24">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-[400px] w-[400px] rounded-full bg-jade/10 blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 h-[350px] w-[350px] rounded-full bg-navy-accent/20 blur-[100px]" />
-        </div>
-        
-        <div className="container relative z-10">
-          <nav className="mb-6 flex items-center gap-2 text-sm font-medium text-soft/60">
-            <Link href="/categories" className="hover:text-jade-highlight transition-colors">
-              {t("nav.categories")}
-            </Link>
-            <span className="opacity-40">/</span>
-            <span className="text-soft">{pick(category.name, locale)}</span>
-          </nav>
-
-          <div className="max-w-4xl">
-            <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-bold uppercase tracking-widest text-jade-highlight">
-              <Sparkles className="h-3.5 w-3.5" />
-              {t("common.category")}
-            </div>
-            <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-              {pick(category.name, locale)}
-            </h1>
-            <p className="mt-6 text-lg leading-relaxed text-soft/80 sm:text-xl max-w-2xl">
-              {pick(category.description, locale)}
-            </p>
-          </div>
-        </div>
-      </section>
+      <PageHero
+        eyebrow={t("common.category")}
+        icon={Sparkles}
+        title={pick(category.name, locale)}
+        subtitle={pick(category.description, locale)}
+      />
 
       <div className="container">
         {/* Methodology / Criteria Section - Collapsible */}

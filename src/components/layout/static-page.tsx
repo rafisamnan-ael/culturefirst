@@ -3,6 +3,7 @@ import { AlertTriangle, Sparkles } from "lucide-react";
 import { staticPages } from "@/content/pages";
 import { getServerT } from "@/lib/i18n/server";
 import { ratingScale } from "@/lib/config";
+import { PageHero } from "@/components/layout/page-hero";
 
 export async function StaticPage({
   slug,
@@ -19,26 +20,12 @@ export async function StaticPage({
 
   return (
     <div className="pb-20">
-      {/* Colorful Header */}
-      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft py-16 md:py-24">
-        <div aria-hidden className="pointer-events-none absolute inset-0">
-          <div className="absolute -right-24 -top-24 h-[400px] w-[400px] rounded-full bg-jade/10 blur-[100px]" />
-          <div className="absolute -bottom-24 -left-24 h-[350px] w-[350px] rounded-full bg-navy-accent/20 blur-[100px]" />
-        </div>
-        
-        <div className="container relative z-10 max-w-3xl">
-          <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/5 px-4 py-1 text-xs font-bold uppercase tracking-widest text-jade-highlight">
-            <Sparkles className="h-3.5 w-3.5" />
-            {page.title[locale]}
-          </div>
-          <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl">
-            {page.title[locale]}
-          </h1>
-          <p className="mt-6 text-lg leading-relaxed text-soft/80 sm:text-xl">
-            {page.intro[locale]}
-          </p>
-        </div>
-      </section>
+      <PageHero
+        eyebrow={page.title[locale]}
+        icon={Sparkles}
+        title={page.title[locale]}
+        subtitle={page.intro[locale]}
+      />
 
       <div className="container max-w-3xl py-12">
         {showThresholds && (

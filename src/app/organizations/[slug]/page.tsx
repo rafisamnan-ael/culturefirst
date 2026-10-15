@@ -1,11 +1,11 @@
 import { notFound, permanentRedirect } from "next/navigation";
 import Link from "next/link";
 import type { Metadata } from "next";
-import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { MapPin, Globe, Star, ExternalLink, PenLine } from "lucide-react";
 import { OrganizationProfileView, type ProfilePerspective, type ProfileParameter } from "@/components/organizations/organization-profile-view";
 import { OrgLogo } from "@/components/organizations/org-logo";
+import { AnimatedBackdrop } from "@/components/layout/page-hero";
 import { getStore } from "@/lib/data";
 import { getServerT } from "@/lib/i18n/server";
 import { pick } from "@/lib/i18n/pick";
@@ -112,115 +112,126 @@ export default async function OrganizationProfilePage({
   const hasAnyAvailableBundle = perspectives.some((p) => p.questionnaireAvailable);
 
   return (
-    <div className="container py-8 sm:py-10">
+    <div>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }} />
-      <nav className="mb-4 text-sm text-muted-foreground">
-        <Link href="/organizations" className="hover:text-jade">
-          {t("nav.directory")}
-        </Link>
-        {category && (
-          <>
-            <span className="mx-2">/</span>
-            <Link href={`/categories/${category.slug}`} className="hover:text-jade">
-              {pick(category.name, locale)}
+
+      <section className="relative overflow-hidden border-b border-border bg-mesh text-soft py-10 md:py-14">
+        <AnimatedBackdrop />
+        <div className="container relative z-10">
+          <nav className="mb-6 flex items-center gap-1 text-sm text-soft/60">
+            <Link href="/organizations" className="transition-colors hover:text-jade-highlight">
+              {t("nav.directory")}
             </Link>
-          </>
-        )}
-      </nav>
-
-      <header className="flex flex-col gap-5 border-b border-border pb-6 sm:flex-row sm:items-start sm:justify-between">
-        <div className="flex items-start gap-4">
-          <OrgLogo slug={org.slug} name={org.officialName} />
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-charcoal sm:text-3xl">
-              {org.officialName}
-            </h1>
-            {org.bengaliName && (
-              <p className="mt-0.5 text-base text-muted-foreground" lang="bn">
-                {org.bengaliName}
-              </p>
+            {category && (
+              <>
+                <span className="mx-1 text-soft/30">/</span>
+                <Link href={`/categories/${category.slug}`} className="transition-colors hover:text-jade-highlight">
+                  {pick(category.name, locale)}
+                </Link>
+              </>
             )}
-            <div className="mt-2.5 flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
-              {category && <Badge variant="jade">{pick(category.name, locale)}</Badge>}
-              {org.city && (
-                <span className="inline-flex items-center gap-1">
-                  <MapPin className="h-3 w-3" />
-                  {org.city}
-                  {org.district && org.district !== org.city ? `, ${org.district}` : ""}
-                </span>
-              )}
-              <Badge variant="outline">{org.claimStatus === "claimed" ? t("org.claimed") : t("org.unclaimed")}</Badge>
+          </nav>
+
+          <header className="flex animate-fade-up flex-col gap-6 sm:flex-row sm:items-start sm:justify-between">
+            <div className="flex items-start gap-4">
+              <OrgLogo slug={org.slug} name={org.officialName} />
+              <div>
+                <h1 className="text-2xl font-bold tracking-tight text-white sm:text-4xl">
+                  {org.officialName}
+                </h1>
+                {org.bengaliName && (
+                  <p className="mt-1 text-base text-soft/70" lang="bn">
+                    {org.bengaliName}
+                  </p>
+                )}
+                <div className="mt-3 flex flex-wrap items-center gap-2 text-xs">
+                  {category && (
+                    <span className="inline-flex items-center gap-1.5 rounded-full border border-jade/30 bg-jade/15 px-3 py-1 font-semibold text-jade-highlight">
+                      {pick(category.name, locale)}
+                    </span>
+                  )}
+                  {org.city && (
+                    <span className="inline-flex items-center gap-1 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-soft/75">
+                      <MapPin className="h-3 w-3" />
+                      {org.city}
+                      {org.district && org.district !== org.city ? `, ${org.district}` : ""}
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/5 px-3 py-1 text-soft/75">
+                    {org.claimStatus === "claimed" ? t("org.claimed") : t("org.unclaimed")}
+                  </span>
+                </div>
+              </div>
             </div>
-          </div>
+
+            <div className="flex shrink-0 flex-wrap items-center gap-2.5 sm:self-start">
+              {hasAnyAvailableBundle ? (
+                <Button asChild variant="accent" size="default" className="shine-sweep font-semibold shadow-glow">
+                  <Link href={`/organizations/${org.slug}/review`}>
+                    <PenLine className="h-4 w-4" />
+                    {t("nav.writeReview")}
+                  </Link>
+                </Button>
+              ) : (
+                <Button disabled variant="outline" size="default" className="border-white/20 text-soft/60">
+                  {t("review.reviewsComingSoon")}
+                </Button>
+              )}
+
+              {org.website ? (
+                <a
+                  href={org.website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-soft backdrop-blur transition hover:bg-white/20 sm:text-sm"
+                >
+                  <Globe className="h-4 w-4" />
+                  {t("org.officialWebsite")}
+                  <ExternalLink className="h-3.5 w-3.5" />
+                </a>
+              ) : null}
+
+              <a
+                href={
+                  org.googleMapsUrl ??
+                  `https://www.google.com/search?q=${encodeURIComponent(`${org.officialName} ${org.city ?? "Bangladesh"}`)}`
+                }
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 rounded-md border border-white/15 bg-white/10 px-3 py-2 text-xs font-medium text-soft backdrop-blur transition hover:bg-white/20 sm:text-sm"
+              >
+                <Star className="h-4 w-4 text-gold-light" />
+                {org.googlePlaceId ? t("org.viewGoogleReviews") : t("org.googleSearch")}
+              </a>
+            </div>
+          </header>
+
+          <p className="mt-6 max-w-3xl animate-fade-up delay-200 text-sm leading-relaxed text-soft/75">
+            {pick(org.description, locale)}
+          </p>
         </div>
+      </section>
 
-        <div className="flex shrink-0 flex-wrap items-center gap-2.5 sm:self-start">
-          {/* Prominent Write Review CTA */}
-          {hasAnyAvailableBundle ? (
-            <Button asChild variant="accent" size="default" className="font-semibold shadow-sm">
-              <Link href={`/organizations/${org.slug}/review`}>
-                <PenLine className="h-4 w-4" />
-                {t("nav.writeReview")}
-              </Link>
-            </Button>
-          ) : (
-            <Button disabled variant="outline" size="default" className="text-muted-foreground">
-              {t("review.reviewsComingSoon")}
-            </Button>
-          )}
-
-          {org.website ? (
-            <a
-              href={org.website}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-2 text-xs sm:text-sm font-medium text-jade hover:bg-warmgray"
-            >
-              <Globe className="h-4 w-4" />
-              {t("org.officialWebsite")}
-              <ExternalLink className="h-3.5 w-3.5" />
-            </a>
-          ) : null}
-
-          <a
-            href={
-              org.googleMapsUrl ??
-              `https://www.google.com/search?q=${encodeURIComponent(`${org.officialName} ${org.city ?? "Bangladesh"}`)}`
-            }
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-2 text-xs sm:text-sm font-medium text-charcoal shadow-card transition hover:bg-warmgray"
-          >
-            <Star className="h-4 w-4 text-gold" />
-            {org.googlePlaceId ? t("org.viewGoogleReviews") : t("org.googleSearch")}
-          </a>
-        </div>
-      </header>
-
-      <p className="mt-6 max-w-3xl text-sm leading-relaxed text-muted-foreground">
-        {pick(org.description, locale)}
-      </p>
-
-      <div className="mt-8">
+      <div className="container py-8 sm:py-10">
         <OrganizationProfileView
           slug={org.slug}
           perspectives={perspectives}
           googleMapsUrl={org.googleMapsUrl}
           googleReviewsVerified={Boolean(org.googlePlaceId)}
         />
-      </div>
 
-      <section className="mt-10 rounded-lg border border-border bg-white p-5">
-        <h2 className="text-sm font-semibold text-charcoal">{t("org.methodologyLink")}</h2>
-        <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
-          {locale === "bn"
-            ? "প্রতিটি দৃষ্টিভঙ্গি আলাদাভাবে স্কোর করা হয়। স্কোর ১–৫ স্কেলে ওজনযুক্ত গড়; “দেখিনি” উত্তর বাদ যায়। শুধু অনুমোদিত, যোগ্য রিভিউ অন্তর্ভুক্ত হয়।"
-            : "Each perspective is scored separately. Scores are weighted averages on a 1–5 scale; “Not observed” answers are excluded. Only approved, eligible reviews are included."}
-        </p>
-        <Link href="/methodology" className="mt-3 inline-block text-sm font-medium text-jade hover:underline">
-          {brand.name} {locale === "bn" ? "পদ্ধতি" : "methodology"} →
-        </Link>
-      </section>
+        <section className="mt-10 rounded-2xl border border-border bg-white p-5 shadow-soft">
+          <h2 className="text-sm font-semibold text-charcoal">{t("org.methodologyLink")}</h2>
+          <p className="mt-2 text-sm leading-relaxed text-muted-foreground">
+            {locale === "bn"
+              ? "প্রতিটি দৃষ্টিভঙ্গি আলাদাভাবে স্কোর করা হয়। স্কোর ১–৫ স্কেলে ওজনযুক্ত গড়; “দেখিনি” উত্তর বাদ যায়। শুধু অনুমোদিত, যোগ্য রিভিউ অন্তর্ভুক্ত হয়।"
+              : "Each perspective is scored separately. Scores are weighted averages on a 1–5 scale; “Not observed” answers are excluded. Only approved, eligible reviews are included."}
+          </p>
+          <Link href="/methodology" className="mt-3 inline-block text-sm font-medium text-jade hover:underline">
+            {brand.name} {locale === "bn" ? "পদ্ধতি" : "methodology"} →
+          </Link>
+        </section>
+      </div>
     </div>
   );
 }
