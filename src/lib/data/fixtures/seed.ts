@@ -158,8 +158,8 @@ export const categorySeeds: Array<{ slug: string; en: string; bn: string; icon: 
     bn: "বিদ্যালয়",
     icon: "school",
     isFallback: false,
-    descEn: "Schools and madrasas. Student, former-student, parent or guardian, and staff perspectives are kept separate — a dedicated school questionnaire is being prepared.",
-    descBn: "বিদ্যালয় ও মাদ্রাসা। শিক্ষার্থী, সাবেক শিক্ষার্থী, অভিভাবক ও কর্মীদের দৃষ্টিভঙ্গি আলাদা রাখা হয় — একটি নির্দিষ্ট বিদ্যালয় প্রশ্নমালা প্রস্তুত করা হচ্ছে।",
+    descEn: "Schools and madrasas. Student, former-student, parent or guardian, and staff perspectives are kept separate, each scored with its own school questionnaire.",
+    descBn: "বিদ্যালয় ও মাদ্রাসা। শিক্ষার্থী, সাবেক শিক্ষার্থী, অভিভাবক ও কর্মীদের দৃষ্টিভঙ্গি আলাদা রাখা হয়; প্রতিটি নিজস্ব বিদ্যালয় প্রশ্নমালায় স্কোর করা হয়।",
   },
   {
     slug: "bank-financial",
@@ -388,7 +388,6 @@ export const templateSeeds: TemplateSeed[] = [
     relationshipSlugs: ["student", "former-student"],
     nameEn: "School Student Experience",
     nameBn: "বিদ্যালয় শিক্ষার্থী অভিজ্ঞান",
-    draft: true,
     params: [
       { key: "teacher-respect", en: "Teacher respect toward students", bn: "শিক্ষকদের প্রতি শিক্ষার্থীর সম্মান", weight: 20, questions: [q("Do teachers treat students respectfully?", "শিক্ষকরা শিক্ষার্থীদের সাথে সম্মানের সাথে ব্যবহার করেন?")] },
       { key: "dignity", en: "Student dignity and antibullying", bn: "শিক্ষার্থীর মর্যাদা ও হয়রানিমুক্ত পরিবেশ", weight: 20, questions: [q("Do students feel safe from mockery or humiliation?", "শিক্ষার্থীরা উপহাস বা অবমাননার ভয় থেকে মুক্ত বোধ করে?")] },
@@ -405,7 +404,6 @@ export const templateSeeds: TemplateSeed[] = [
     relationshipSlugs: ["parent-guardian"],
     nameEn: "School Parent & Guardian Experience",
     nameBn: "বিদ্যালয় অভিভাবক অভিজ্ঞান",
-    draft: true,
     params: [
       { key: "respect", en: "Respectful treatment of families", bn: "পরিবারের প্রতি সম্মানজনক আচরণ", weight: 20, questions: [] },
       { key: "communication", en: "Communication with parents", bn: "অভিভাবকের সাথে যোগাযোগ", weight: 20, questions: [] },
@@ -420,7 +418,6 @@ export const templateSeeds: TemplateSeed[] = [
     relationshipSlugs: ["current-employee", "former-employee"],
     nameEn: "School Workplace Culture",
     nameBn: "বিদ্যালয় কর্মক্ষেত্র সংস্কৃতি",
-    draft: true,
     params: [
       { key: "leadership", en: "Leadership and supervisor respect", bn: "নেতৃত্ব ও সুপারভাইজার সম্মান", weight: 20, questions: [] },
       { key: "respect", en: "Workplace respect", bn: "কর্মক্ষেত্রে সম্মান", weight: 20, questions: [] },
