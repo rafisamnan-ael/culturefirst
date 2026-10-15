@@ -51,6 +51,33 @@ function bid(en: string, bn: string) {
   return { en, bn };
 }
 
+/** Normalise a name, slug or alias for duplicate detection. */
+export function normalizeOrgKey(value: string): string {
+  return value
+    .toLowerCase()
+    .normalize("NFKD")
+    .replace(/[^a-z0-9\u0980-\u09FF]+/g, "");
+}
+
+/**
+ * Guard the directory against accidental double-insertion. Removes organization
+ * seeds that collide with an earlier seed on slug, normalized official name, or
+ * a declared alias / alternate name, keeping the first occurrence.
+ */
+export function dedupeOrganizationSeeds<
+  T extends { slug: string; en: string; aliases?: string[]; alternateNames?: string[] },
+>(seeds: T[]): T[] {
+  const seen = new Set<string>();
+  const unique: T[] = [];
+  for (const seed of seeds) {
+    const keys = [seed.slug, seed.en, ...(seed.alternateNames ?? []), ...(seed.aliases ?? [])].map(normalizeOrgKey);
+    if (keys.some((key) => seen.has(key))) continue;
+    for (const key of keys) seen.add(key);
+    unique.push(seed);
+  }
+  return unique;
+}
+
 interface ParamSeed {
   key: string;
   en: string;
@@ -418,6 +445,7 @@ export const organizationSeeds: Array<{
   descriptionBn: string;
   website?: string;
   googleMapsUrl?: string;
+  googlePlaceId?: string;
   branches?: Array<{ name: string; city: string; district: string }>;
   alternateNames?: string[];
   aliases?: string[];
@@ -512,7 +540,110 @@ export const organizationSeeds: Array<{
   { slug: "aci-limited", en: "Advanced Chemical Industries (ACI)", bn: "এসিআই লিমিটেড", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A Bangladeshi conglomerate in pharma, agribusiness and consumer brands.", descriptionBn: "ঔষধ, কৃষি ও ভোক্তা পণ্যে একটি বাংলাদেশি কনগ্লোমারেট।", website: "https://www.aci-bd.com" },
   { slug: "pran-rfl-group", en: "PRAN-RFL Group", bn: "প্রাণ-আরএফএল গ্রুপ", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A food and consumer goods conglomerate.", descriptionBn: "একটি খাদ্য ও ভোক্তা পণ্য কনগ্লোমারেট।", website: "https://www.prangroup.com" },
   { slug: "meghna-group", en: "Meghna Group of Industries", bn: "মেঘনা গ্রুপ অব ইন্ডাস্ট্রিজ", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A large diversified industrial group.", descriptionBn: "একটি বড় বহুমুখী শিল্প গ্রুপ।", website: "https://www.meghnagroup.biz" },
-  { slug: "akij-group", en: "Akij Group", bn: "আকিজ গ্রুপ", categorySlug: "private-company", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A large Bangladeshi industrial conglomerate.", descriptionBn: "একটি বড় বাংলাদেশি শিল্প কনগ্লোমারেট।", website: "https://www.akij.net" },
+  // --- Akij group of companies (separate profiles; never merged or combined) ---
+  {
+    slug: "akij-group",
+    en: "Akij Group",
+    bn: "আকিজ গ্রুপ",
+    alternateNames: ["Akij Group Ltd."],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn:
+      "Legacy umbrella conglomerate and the founding group behind the Akij family of businesses in Bangladesh.",
+    descriptionBn:
+      "বাংলাদেশের আকিজ ব্যবসা পরিবারের মূল প্রতিষ্ঠান ও উত্তরাধিকার কনগ্লোমারেট।",
+    website: "https://akij.net/",
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Akij%20Group%20Dhaka&query_place_id=ChIJ88KY3njHVTcRoWa3m1fJtRo",
+    googlePlaceId: "ChIJ88KY3njHVTcRoWa3m1fJtRo",
+  },
+  {
+    slug: "akij-venture-ltd",
+    en: "Akij Venture Ltd.",
+    bn: "আকিজ ভেঞ্চার লিমিটেড",
+    aliases: ["akij-venture"],
+    alternateNames: ["Akij Venture"],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn: "A separate business group under the Akij family of companies.",
+    descriptionBn: "আকিজ পরিবারের অধীনে একটি পৃথক ব্যবসায়িক গ্রুপ।",
+    website: "https://www.akijventure.com/",
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Akij%20Venture%20Ltd%20Dhaka&query_place_id=ChIJV-IrKYDHVTcRRHgogjyxs3Q",
+    googlePlaceId: "ChIJV-IrKYDHVTcRRHgogjyxs3Q",
+  },
+  {
+    slug: "akij-resource-ltd",
+    en: "Akij Resource Ltd.",
+    bn: "আকিজ রিসোর্স লিমিটেড",
+    aliases: ["akij-resource"],
+    alternateNames: ["Akij Resource"],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn: "A separate Akij-affiliated business group.",
+    descriptionBn: "আকিজ-অনুষঙ্গিক একটি পৃথক ব্যবসায়িক গ্রুপ।",
+    website: "https://akijresource.com/",
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Akij%20Resource%20Dhaka&query_place_id=ChIJcW2bBoDHVTcRjKuoiINz2W4",
+    googlePlaceId: "ChIJcW2bBoDHVTcRjKuoiINz2W4",
+  },
+  {
+    slug: "akijbashir-group",
+    en: "AkijBashir Group",
+    bn: "আকিজবশির গ্রুপ",
+    aliases: ["akij-bashir-group", "akij-bashir"],
+    alternateNames: ["Akij Bashir Group", "AkijBashir"],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn: "A separate Akij-affiliated business group.",
+    descriptionBn: "আকিজ-অনুষঙ্গিক একটি পৃথক ব্যবসায়িক গ্রুপ।",
+    website: "https://akijbashir.com/",
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=AkijBashir%20Group%20Dhaka&query_place_id=ChIJK5RhWsXHVTcRwLWEKYLjW3I",
+    googlePlaceId: "ChIJK5RhWsXHVTcRwLWEKYLjW3I",
+  },
+  {
+    slug: "akij-insaf-group",
+    en: "Akij Insaf Group",
+    bn: "আকিজ ইনসাফ গ্রুপ",
+    aliases: ["akij-insaf"],
+    alternateNames: ["Akij Insaf"],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn: "A separate Akij-affiliated business group.",
+    descriptionBn: "আকিজ-অনুষঙ্গিক একটি পৃথক ব্যবসায়িক গ্রুপ।",
+    website: "https://akijinsaf.com/",
+    // Search link only — no verified Google Place ID was supplied for this group.
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Akij%20Insaf%20Group%20Bangladesh",
+  },
+  {
+    slug: "akij-assets-ltd",
+    en: "Akij Assets Ltd.",
+    bn: "আকিজ অ্যাসেটস লিমিটেড",
+    aliases: ["akij-assets"],
+    alternateNames: ["Akij Assets"],
+    categorySlug: "private-company",
+    division: "Dhaka",
+    district: "Dhaka",
+    city: "Dhaka",
+    descriptionEn: "A separate Akij-affiliated business group.",
+    descriptionBn: "আকিজ-অনুষঙ্গিক একটি পৃথক ব্যবসায়িক গ্রুপ।",
+    // Official website not verified — intentionally left empty (do not invent).
+    // Search link only — no verified Google Place ID was supplied for this group.
+    googleMapsUrl:
+      "https://www.google.com/maps/search/?api=1&query=Akij%20Assets%20Ltd%20Bangladesh",
+  },
 
   // --- Hospitals & Clinics ---
   { slug: "united-hospital-dhaka", en: "United Hospital", bn: "ইউনাইটেড হাসপাতাল", categorySlug: "hospital-clinic", division: "Dhaka", district: "Dhaka", city: "Dhaka", descriptionEn: "A private hospital in Dhaka.", descriptionBn: "ঢাকার একটি বেসরকারি হাসপাতাল।", website: "https://www.unitedhospital.com.bd" },
@@ -1046,7 +1177,9 @@ export function createSeedState(): SeedState {
     });
   }
 
-  const organizations: Organization[] = organizationSeeds.map((o) => ({
+  const uniqueOrganizationSeeds = dedupeOrganizationSeeds(organizationSeeds);
+
+  const organizations: Organization[] = uniqueOrganizationSeeds.map((o) => ({
     id: `org-${o.slug}`,
     slug: o.slug,
     officialName: o.en,
@@ -1062,7 +1195,7 @@ export function createSeedState(): SeedState {
     city: o.city,
     status: "active",
     googleMapsUrl: o.googleMapsUrl ?? null,
-    googlePlaceId: null,
+    googlePlaceId: o.googlePlaceId ?? null,
     verified: true,
     claimStatus: "unclaimed",
     createdAt: now,
@@ -1071,7 +1204,7 @@ export function createSeedState(): SeedState {
 
   const aliases: OrganizationAlias[] = [];
   const branches: OrganizationBranch[] = [];
-  for (const o of organizationSeeds) {
+  for (const o of uniqueOrganizationSeeds) {
     (o.aliases ?? []).forEach((alias, i) => {
       aliases.push({
         id: `al-${o.slug}-${i}`,

@@ -192,7 +192,7 @@ export default async function OrganizationProfilePage({
             className="inline-flex items-center gap-1 rounded-md border border-border bg-white px-3 py-2 text-xs sm:text-sm font-medium text-charcoal shadow-card transition hover:bg-warmgray"
           >
             <Star className="h-4 w-4 text-gold" />
-            {org.googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
+            {org.googlePlaceId ? t("org.viewGoogleReviews") : t("org.googleSearch")}
           </a>
         </div>
       </header>
@@ -202,7 +202,12 @@ export default async function OrganizationProfilePage({
       </p>
 
       <div className="mt-8">
-        <OrganizationProfileView slug={org.slug} perspectives={perspectives} googleMapsUrl={org.googleMapsUrl} />
+        <OrganizationProfileView
+          slug={org.slug}
+          perspectives={perspectives}
+          googleMapsUrl={org.googleMapsUrl}
+          googleReviewsVerified={Boolean(org.googlePlaceId)}
+        />
       </div>
 
       <section className="mt-10 rounded-lg border border-border bg-white p-5">

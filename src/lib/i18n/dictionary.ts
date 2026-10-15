@@ -122,6 +122,7 @@ export const dictionary: Record<string, Bilingual> = {
   },
   "org.organizationResponses": { en: "Organization responses", bn: "প্রতিষ্ঠানের প্রতিক্রিয়া" },
   "org.viewOnGoogle": { en: "View reviews on Google Maps", bn: "গুগল ম্যাপে রিভিউ দেখুন" },
+  "org.viewGoogleReviews": { en: "View Google Reviews", bn: "গুগল রিভিউ দেখুন" },
   "org.googleSearch": { en: "Search for this organization on Google", bn: "গুগলে এই প্রতিষ্ঠানটি খুঁজুন" },
   "org.googleSeparate": {
     en: "Opens in a new tab. Google ratings are entirely separate from CultureFirst culture scores and are never combined.",

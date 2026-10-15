@@ -49,10 +49,12 @@ export function OrganizationProfileView({
   slug,
   perspectives,
   googleMapsUrl,
+  googleReviewsVerified = false,
 }: {
   slug: string;
   perspectives: ProfilePerspective[];
   googleMapsUrl: string | null;
+  googleReviewsVerified?: boolean;
 }) {
   const { t, locale } = useI18n();
   const [activeId, setActiveId] = useState<string | null>(perspectives[0]?.relationshipId ?? null);
@@ -224,7 +226,7 @@ export function OrganizationProfileView({
         <Card>
           <CardContent className="p-5">
             <h3 className="font-semibold text-charcoal">
-              {googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
+              {googleReviewsVerified ? t("org.viewGoogleReviews") : t("org.googleSearch")}
             </h3>
             <p className="mt-1 text-xs text-muted-foreground">{t("org.googleSeparate")}</p>
             <div className="mt-3">
@@ -238,7 +240,7 @@ export function OrganizationProfileView({
                   rel="noopener noreferrer"
                 >
                   <ExternalLink className="h-4 w-4" />
-                  {googleMapsUrl ? t("org.viewOnGoogle") : t("org.googleSearch")}
+                  {googleReviewsVerified ? t("org.viewGoogleReviews") : t("org.googleSearch")}
                 </a>
               </Button>
             </div>
